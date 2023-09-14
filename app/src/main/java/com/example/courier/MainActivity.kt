@@ -10,6 +10,7 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("local_storage", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("server_name", "0000")
+        //*************************************
         editor.apply()
         setContentView(R.layout.activity_main)
     }
