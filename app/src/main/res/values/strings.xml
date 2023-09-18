@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Courier</string>
+    <string name="entrance">Вход</string>
+    <string name="description_title">Для продолжения вам необходимо войти в свою учетную запись</string>
+    <string name="login">Логин</string>
+    <string name="pwd">Пароль</string>
+    <string name="description_question">Еще не зарегистрированы?</string>
+    <string name="registr">Регистрация</string>
+    <string name="name">Имя</string>
+    <string name="enter">Ввод</string>
 </resources>

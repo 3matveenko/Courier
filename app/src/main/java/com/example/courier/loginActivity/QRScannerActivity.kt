@@ -15,31 +15,8 @@ class QRScannerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qr_scanner)
 
-        val integrator = IntentIntegrator(this)
-        integrator.setOrientationLocked(false)
-        integrator.setPrompt("Отсканируйте QR-код у администратора")
-        integrator.initiateScan()
+
     }
 
-    // Метод, вызываемый после завершения сканирования
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val result: IntentResult? =
-            IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        val sharedPreferences = getSharedPreferences("local_storage", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
 
-        if (result != null) {
-            if (result.contents == null) {
-                // Если сканирование было отменено
-                Toast.makeText(this, "Сканирование отменено", Toast.LENGTH_SHORT).show()
-                finish()
-            } else {
-                // Если QR-код был успешно прочитан
-                editor.putString("server_name", result.contents)
-                editor.apply()
-                finish()
-            }
-        }
-    }
 }
