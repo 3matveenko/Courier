@@ -9,14 +9,5 @@ import com.example.courier.R
 
 class LoginActivity: AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.login)
 
-        findViewById<Button>(R.id.but_registr).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.base_color))
-        findViewById<Button>(R.id.but_enter).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.base_color))
-            findViewById<Button>(R.id.but_registr).setOnClickListener {
-            startActivity(Intent(this@LoginActivity, RegistrActivity::class.java))
-        }
-    }
 }
