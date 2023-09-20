@@ -11,6 +11,6 @@ interface API {
 
     @Headers("Content-Type: application/json;charset=UTF-8")
     @POST("/app/create")
-    fun createAccount(@Body query: CreateDriver): Call<Token>
+    fun createAccount(@Body query: CreateDriver): Call<String>
 
 }

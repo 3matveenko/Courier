@@ -2,17 +2,24 @@ package com.example.courier.rest
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.courier.R
+import com.example.courier.activity.HomeActivity
 import com.example.courier.models.CreateDriver
 import com.example.courier.models.Settings
 import com.example.courier.models.Token
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.zxing.integration.android.IntentIntegrator
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.await
+import retrofit2.awaitResponse
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Modifier
 
@@ -22,6 +29,7 @@ class Http(private var activity: AppCompatActivity, private var context: Context
 
 
     private var gson: Gson = GsonBuilder()
+        .setLenient()
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
         .excludeFieldsWithModifiers(
             Modifier.STATIC,
@@ -49,18 +57,25 @@ class Http(private var activity: AppCompatActivity, private var context: Context
 
         this.api.createAccount(
             createDriver
-        ).enqueue(object : Callback<Token> {
+        ).enqueue(object : Callback<String> {
             @SuppressLint("CutPasteId", "SetTextI18n", "SimpleDateFormat")
-            override fun onResponse(call: Call<Token>, response: Response<Token>) {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
-                    Toast.makeText(context, "okey", Toast.LENGTH_LONG).show()
-                    activity.finish()
+                    val intent = Intent(context, HomeActivity::class.java)
+                    Settings(activity).save("token", response.body().toString())
+                    activity.startActivity(intent)
                 }
                 //(activity as DocumentActivity).view(false)
             }
 
-            override fun onFailure(call: Call<Token>, throwable: Throwable) {
-                Toast.makeText(context, throwable.localizedMessage, Toast.LENGTH_LONG).show()
+            override fun onFailure(call: Call<String>, throwable: Throwable) {
+                Log.e("httpConnect", throwable.localizedMessage)
+                Toast.makeText(context, "Ошибка подключения", Toast.LENGTH_LONG).show()
+                activity.setContentView(R.layout.activity_qr_scanner)
+                val integrator = IntentIntegrator(activity)
+                integrator.setOrientationLocked(false)
+                integrator.setPrompt("Отсканируйте QR-код у администратора")
+                integrator.initiateScan()
 
                 //(activity as DocumentActivity).view(false)
             }

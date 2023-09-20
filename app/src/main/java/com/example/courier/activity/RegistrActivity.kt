@@ -1,4 +1,4 @@
-package com.example.courier.loginActivity
+package com.example.courier.activity
 
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
