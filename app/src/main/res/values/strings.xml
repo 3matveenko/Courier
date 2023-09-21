@@ -4,6 +4,7 @@
     <string name="description_title">Для продолжения вам необходимо войти в свою учетную запись</string>
     <string name="login">Логин</string>
     <string name="pwd">Пароль</string>
+    <string name="rePassword">Повторите пароль</string>
     <string name="description_question">Еще не зарегистрированы?</string>
     <string name="registr">Регистрация</string>
     <string name="name">Имя</string>

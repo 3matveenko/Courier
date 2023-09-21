@@ -2,7 +2,7 @@ package com.example.courier.models
 
 import com.google.gson.annotations.SerializedName
 
-data class Login (
+data class LoginDriver (
 
     @SerializedName(value = "login")
     val login:String,
