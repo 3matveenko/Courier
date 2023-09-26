@@ -44,4 +44,5 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.3.0")
+    implementation ("com.rabbitmq:amqp-client:5.13.1")
 }

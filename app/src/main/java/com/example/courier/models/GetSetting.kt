@@ -4,11 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 
-class Settings(context: Context) {
+class GetSettings(context: Context) {
 
     companion object {
-        @JvmStatic
-        val SERVER_NAME:String = "server_name"
+
+        const val SERVER_NAME:String = "server_name"
+
+        const val RABBIT_SERVER_NAME = "rabbit_server_name"
+
     }
     private var sharedPreferences: SharedPreferences
     init {

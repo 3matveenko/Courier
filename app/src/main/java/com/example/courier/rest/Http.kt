@@ -7,8 +7,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.courier.activity.HomeActivity
 import com.example.courier.models.CreateDriver
+import com.example.courier.models.GetSettings
 import com.example.courier.models.LoginDriver
-import com.example.courier.models.Settings
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.zxing.integration.android.IntentIntegrator
@@ -35,7 +35,7 @@ class Http(private var activity: AppCompatActivity) {
         .create()
 
     init {
-            val retrofit = Settings(activity).load(Settings.SERVER_NAME)?.let {
+            val retrofit = GetSettings(activity).load(GetSettings.SERVER_NAME)?.let {
                 Retrofit.Builder()
                     .baseUrl(it)
                     .addConverterFactory(GsonConverterFactory.create(this.gson))
@@ -55,7 +55,7 @@ class Http(private var activity: AppCompatActivity) {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
                     val intent = Intent(activity, HomeActivity::class.java)
-                    Settings(activity).save("token", response.body().toString())
+                    GetSettings(activity).save("token", response.body().toString())
                     Toast.makeText(activity.applicationContext, "Вы успешно прошли регистрацию", Toast.LENGTH_LONG).show()
                     activity.startActivity(intent)
                 }
@@ -84,7 +84,7 @@ class Http(private var activity: AppCompatActivity) {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
                     val intent = Intent(activity, HomeActivity::class.java)
-                    Settings(activity).save("token", response.body().toString())
+                    GetSettings(activity).save("token", response.body().toString())
                     activity.startActivity(intent)
                 }
                 if (response.code() == 403) {

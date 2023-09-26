@@ -6,12 +6,14 @@ import android.os.Process
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.courier.R
+import com.example.courier.rest.Rabbit
 
 class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        Rabbit(this).startListening()
     }
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {

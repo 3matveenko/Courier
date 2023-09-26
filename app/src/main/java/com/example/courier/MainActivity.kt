@@ -13,9 +13,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.example.courier.activity.HomeActivity
 import com.example.courier.activity.RegistrActivity
+import com.example.courier.models.GetSettings
 import com.example.courier.models.LoginDriver
-import com.example.courier.models.Settings
+import com.example.courier.models.Setting
+import com.example.courier.models.isNotNull
 import com.example.courier.rest.Http
+import com.google.gson.Gson
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 
@@ -23,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        if(!Settings(this).isNull("token")){
+        if(!GetSettings(this).isNull("token")){
             startActivity(Intent(this@MainActivity, HomeActivity::class.java))
         }
 
@@ -60,8 +63,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (Settings(applicationContext).isNull(Settings.SERVER_NAME)) {
-            Toast.makeText(this, Settings(applicationContext).load(Settings.SERVER_NAME),Toast.LENGTH_LONG).show()
+        if (GetSettings(applicationContext).isNull(GetSettings.SERVER_NAME)) {
+            Toast.makeText(this, GetSettings(applicationContext).load(GetSettings.SERVER_NAME),Toast.LENGTH_LONG).show()
             startQr()
         }
 
@@ -85,9 +88,15 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Сканирование отменено", Toast.LENGTH_SHORT).show()
                 finish()
             } else {
-                Settings(applicationContext).save(Settings.SERVER_NAME,result.contents)
-                Toast.makeText(this, Settings(applicationContext).load(Settings.SERVER_NAME),Toast.LENGTH_LONG).show()
-               this.recreate()
+                val gson = Gson()
+                val setting:Setting = gson.fromJson(result.contents, Setting::class.java)
+                 if(isNotNull(setting)){
+                     GetSettings(applicationContext).save(GetSettings.SERVER_NAME,setting.SERVER_NAME)
+                     GetSettings(applicationContext).save(GetSettings.RABBIT_SERVER_NAME,setting.RABBIT_SERVER_NAME)
+                     Toast.makeText(this, GetSettings(applicationContext).load(GetSettings.SERVER_NAME),Toast.LENGTH_LONG).show()
+
+                 }
+                this.recreate()
             }
         }
     }
