@@ -35,6 +35,17 @@ data class Setting(
     @SerializedName(value = "rabbit_server_name")
     val RABBIT_SERVER_NAME:String
 )
+
+data class Message(
+    @SerializedName(value = "code")
+    val code:String,
+
+    @SerializedName(value = "millisecondsSinceEpoch")
+    val millisecondsSinceEpoch:Long,
+
+    @SerializedName(value = "body")
+    val body:String
+)
 fun isNotNull(setting: Setting): Boolean {
     return setting.SERVER_NAME != null && setting.RABBIT_SERVER_NAME != null
 }

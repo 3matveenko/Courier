@@ -1,18 +1,13 @@
 package com.example.courier.rest
 
+import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
 
-class ServerPing(private var activity: AppCompatActivity) {
+class ServerPing(private var context: Context) {
 
     fun pingServer(host: String, port: Int, timeoutMillis: Int): Boolean {
         try {
@@ -31,15 +26,15 @@ class ServerPing(private var activity: AppCompatActivity) {
                 val serverHost = "192.168.0.147"
                 val serverPort = 80
 
-                val serverPing = ServerPing(activity)
+                val serverPing = ServerPing(context)
                 val isServerReachable =
-                    serverPing.pingServer(serverHost, serverPort, 5000)
+                    serverPing.pingServer(serverHost, serverPort, 60000)
 
                 if (!isServerReachable) {
 
                     val intent = Intent("no_connection")
                     intent.putExtra("message", "нет связи с сервером")
-                    LocalBroadcastManager.getInstance(activity.applicationContext).sendBroadcast(intent)
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
 //                    val handler = Handler(Looper.getMainLooper())
 //                    handler.post {
 //                        Log.d("loginfo", "нет связи с сервером")
@@ -47,7 +42,7 @@ class ServerPing(private var activity: AppCompatActivity) {
 //                            .show()
 //                    }
                 }
-                Thread.sleep(2000)
+                Thread.sleep(5000)
             }
         }).start()
     }

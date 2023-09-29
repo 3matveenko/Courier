@@ -1,16 +1,22 @@
 package com.example.courier.rest
 
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.courier.models.Message
+import com.google.gson.Gson
+import com.google.gson.JsonParser
 import com.rabbitmq.client.AMQP
 import com.rabbitmq.client.Channel
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import com.rabbitmq.client.DefaultConsumer
 import com.rabbitmq.client.Envelope
+import org.json.JSONObject
 import java.io.IOException
 
 class Rabbit(private var activity: AppCompatActivity) {
@@ -48,16 +54,32 @@ class Rabbit(private var activity: AppCompatActivity) {
                     properties: AMQP.BasicProperties?,
                     body: ByteArray?
                 ) {
-                        val message = String(body!!, Charsets.UTF_8)
-                        val handler = Handler(Looper.getMainLooper())
-                        handler.post {
-                            Log.d("loginfo", message)
-                            Toast.makeText(activity.applicationContext, message, Toast.LENGTH_LONG)
-                                .show()
-                            NotificationHandler().createNotificationChannel(activity.applicationContext)
-                            NotificationHandler().showNotification(activity.applicationContext, message, "Новый заказ")
+                        val stringMessage = String(body!!, Charsets.UTF_8)
+//                        NotificationHandler().createNotificationChannel(activity.applicationContext)
+//                        NotificationHandler().showNotification(activity.applicationContext, message, "Новый заказ")
+                    val intent = Intent("open_new_order")
+                    LocalBroadcastManager.getInstance(activity).sendBroadcast(intent)
+                    Log.e("debugg", "получил сообщение вызвал бродкаст $stringMessage")
 
-                        }
+                    val gson = Gson()
+                    val message = gson.fromJson(stringMessage, Message::class.java)
+                    Log.e("debugg", "код ${message.code}")
+                    Log.e("debugg", "миллисекунды ${message.millisecondsSinceEpoch}")
+                    Log.e("debugg", "боди ${message.body}")
+
+//                    var j = JsonParser().parse(message) as JSONObject
+//                    var a =  j.get("body") as String
+//                    var z = JsonParser().parse(a) as JSONObject
+
+                    //Log.e("debugg", "состав сообщения $z")
+
+
+
+//                        val handler = Handler(Looper.getMainLooper())
+//                        handler.post {
+//                            Toast.makeText(activity.applicationContext, message, Toast.LENGTH_LONG)
+//                                .show()
+//                        }
                 }
             }
                 channel.basicConsume("Driver0", true, consumer)

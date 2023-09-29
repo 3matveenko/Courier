@@ -10,4 +10,7 @@
     <string name="name">Имя</string>
     <string name="enter">Ввод</string>
     <string name="qr">QR</string>
+    <string name="title_activity_new_order">вам поступил новый заказ</string>
+    <string name="accept">Принять</string>
+    <string name="reject">Отклонить</string>
 </resources>
