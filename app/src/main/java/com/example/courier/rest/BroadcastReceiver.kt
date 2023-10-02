@@ -15,9 +15,9 @@ class MyBroadcastReceiver: BroadcastReceiver() {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
          if (intent?.action == "open_new_order") {
-             val currentTimeInMillis = SystemClock.elapsedRealtime()
-             Log.e("debugg", "попал в иф вызвал активити $currentTimeInMillis")
              val newOrderIntent = Intent(context, NewOrderActivity::class.java)
+             val message = intent.getStringExtra("body")
+             newOrderIntent.putExtra("body", message)
              newOrderIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
              context?.startActivity(newOrderIntent)
          }

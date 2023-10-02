@@ -17,9 +17,11 @@ import android.view.WindowManager
 import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.example.courier.R
+import com.example.courier.rest.Rabbit
 
 class NewOrderActivity : AppCompatActivity() {
 
@@ -35,8 +37,8 @@ class NewOrderActivity : AppCompatActivity() {
 
             // Если разрешение уже есть, устанавливаем флаги и отображаем активность поверх других
             window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
-            window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
-            window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+//            window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+//            window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
             // Вставьте здесь код для отображения содержимого вашей активности
 
@@ -56,8 +58,22 @@ class NewOrderActivity : AppCompatActivity() {
         val vibrationPattern = longArrayOf(0, 100, 1000, 300, 2000)
         vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern, 0))
 
+
+
         findViewById<Button>(R.id.reject).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.red))
         findViewById<Button>(R.id.accept).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.green))
+
+
+        val message = intent.getStringExtra("body")
+        findViewById<Button>(R.id.reject).setOnClickListener{
+            escape()
+        }
+
+        if(message!=null){
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
+
+
 
         Log.e("debugg", "перед таймером")
         mediaPlayer = MediaPlayer.create(this, R.raw.new_order)
@@ -67,11 +83,15 @@ class NewOrderActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                mediaPlayer.release()
-                vibrator.cancel()
-                finish()
+                escape()
             }
         }
         timer.start()
+
+    }
+    fun escape(){
+        mediaPlayer.release()
+        vibrator.cancel()
+        finish()
     }
 }

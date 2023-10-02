@@ -37,6 +37,10 @@ data class Setting(
 )
 
 data class Message(
+
+    @SerializedName(value = "token")
+    val token: String,
+
     @SerializedName(value = "code")
     val code:String,
 

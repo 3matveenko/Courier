@@ -1,6 +1,9 @@
 package com.example.courier.activity
 
 import android.annotation.SuppressLint
+import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -39,11 +42,15 @@ class HomeActivity : AppCompatActivity() {
             )
             startActivity(intent)
         }
-
+        val message = intent.getStringExtra("body")
+        if(message!=null){
+            Toast.makeText(this, message,Toast.LENGTH_LONG).show()
+        }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         ServerPing(this).main()
         Rabbit(this).startListening()
     }
+
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
             @SuppressLint("CutPasteId", "UseCompatLoadingForDrawables")

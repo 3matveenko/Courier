@@ -94,7 +94,6 @@ class MainActivity : AppCompatActivity() {
                      GetSettings(applicationContext).save(GetSettings.SERVER_NAME,setting.SERVER_NAME)
                      GetSettings(applicationContext).save(GetSettings.RABBIT_SERVER_NAME,setting.RABBIT_SERVER_NAME)
                      Toast.makeText(this, GetSettings(applicationContext).load(GetSettings.SERVER_NAME),Toast.LENGTH_LONG).show()
-
                  }
                 this.recreate()
             }
