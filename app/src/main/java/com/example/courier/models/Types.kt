@@ -50,6 +50,14 @@ data class Message(
     @SerializedName(value = "body")
     val body:String
 )
+
+data class LocationMy(
+    @SerializedName(value = "latitude")
+    val latitude: Double,
+
+    @SerializedName(value = "longitude")
+    val longitude: Double
+)
 fun isNotNull(setting: Setting): Boolean {
     return setting.SERVER_NAME != null && setting.RABBIT_SERVER_NAME != null
 }

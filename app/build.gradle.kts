@@ -41,13 +41,14 @@ android {
 dependencies {
 
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-    implementation("androidx.core:core-ktx:1.6.0") // Используйте совместимую версию androidx.core
+    implementation("androidx.core:core-ktx:1.6.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.6.0") // Используйте совместимую версию Material Design
+    implementation("com.google.android.material:material:1.6.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.3.0")
     implementation ("com.rabbitmq:amqp-client:5.13.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
+    implementation ("com.google.android.gms:play-services-location:18.0.0")
 }

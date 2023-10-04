@@ -1,11 +1,12 @@
 package com.example.courier.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Application
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,17 +15,63 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
 import com.example.courier.rest.MyBroadcastReceiver
 import com.example.courier.rest.Rabbit
+import com.example.courier.rest.SendLocation
 import com.example.courier.rest.ServerPing
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import kotlin.system.exitProcess
 
 class HomeActivity : AppCompatActivity() {
+
+    private val LOCATION_PERMISSION_CODE = 101
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        fun isLocationEnabled(context: Context): Boolean {
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                    locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        }
+
+        fun requestLocationEnabled(context: Context) {
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            context.startActivity(intent)
+        }
+
+        fun checkLocationStatus(context: Context) {
+            if (!isLocationEnabled(context)) {
+                // Геолокация не включена, предложим включить её
+                requestLocationEnabled(context)
+            } else {
+                // Геолокация включена, продолжаем работу приложения
+                // Здесь можно добавить код для вашего приложения
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            SendLocation().requestLocation(this)
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_CODE
+            )
+        }
 
         val intentFilter = IntentFilter("no_connection")
         val receiver = MyBroadcastReceiver()
@@ -50,6 +97,7 @@ class HomeActivity : AppCompatActivity() {
         ServerPing(this).main()
         Rabbit(this).startListening()
     }
+
 
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {

@@ -21,6 +21,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.example.courier.R
+import com.example.courier.models.GetSettings
 import com.example.courier.rest.Rabbit
 
 class NewOrderActivity : AppCompatActivity() {
@@ -67,6 +68,11 @@ class NewOrderActivity : AppCompatActivity() {
         val message = intent.getStringExtra("body")
         findViewById<Button>(R.id.reject).setOnClickListener{
             escape()
+        }
+
+        findViewById<Button>(R.id.accept).setOnClickListener{
+            val token = GetSettings(this).load("token").toString()
+            Rabbit(this).sendMessage(token,"accept_order","ok")
         }
 
         if(message!=null){
