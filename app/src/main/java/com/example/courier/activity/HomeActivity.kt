@@ -1,103 +1,131 @@
 package com.example.courier.activity
 
-import android.Manifest
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.location.LocationManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Process
-import android.provider.Settings
-import android.widget.Toast
+import android.util.Log
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
-import com.example.courier.rest.MyBroadcastReceiver
-import com.example.courier.rest.Rabbit
-import com.example.courier.rest.SendLocation
-import com.example.courier.rest.ServerPing
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.example.courier.models.Order
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Modifier
+import java.lang.reflect.Type
 import kotlin.system.exitProcess
 
-class HomeActivity : AppCompatActivity() {
 
-    private val LOCATION_PERMISSION_CODE = 101
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+class HomeActivity : AppCompatActivity() {
+    //private var orders: List<Order?>? = emptyList()
+
+    companion object {
+        @SuppressLint("StaticFieldLeak")
+        private var listView: ListView? = null
+        @SuppressLint("StaticFieldLeak")
+        private var context_c: Context? = null
+        private var orders: List<Order?>? = emptyList()
+
+        const val MESSAGE: String = "MESSAGE"
+
+        val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+
+                val message = intent.getStringExtra("body")
+                Log.e("debuggп", "message null")
+                if (message != null) {
+                    Log.e("debuggп", "message не null")
+
+                    /*val gson = GsonBuilder()
+                        .registerTypeAdapter(
+                            Date::class.java,
+                            JsonDeserializer<Date> { json, _, _ ->
+                                try {
+                                    val format: DateFormat =
+                                        SimpleDateFormat("MMM d, yyyy, h:mm:ss a")
+                                    format.parse(json.asString)
+                                } catch (e: ParseException) {
+                                    null
+                                }
+                            })
+                        .create()*/
+
+                    val gson = GsonBuilder()
+                        .setDateFormat("MMM d, yyyy, h:mm:ss a")
+                        .excludeFieldsWithModifiers(
+                            Modifier.STATIC,
+                            Modifier.TRANSIENT,
+                            Modifier.VOLATILE
+                        )
+                        .create()
+
+                    val deliveryInfoListType: Type =
+                        object : TypeToken<List<Order?>?>() {}.type
+                    orders = gson.fromJson(message, deliveryInfoListType)
+                }
+
+                val stringOrders = mutableListOf<String>()
+                if (orders?.isNotEmpty() == true) {
+                    orders?.forEach {
+                        stringOrders.add(it!!.current)
+                    }
+
+                    if (listView != null) {
+                        listView!!.findViewById<ListView>(R.id.recyclerView).adapter =
+                            context_c?.let { ArrayAdapter(it, android.R.layout.simple_list_item_1, stringOrders)
+                            }
+                    }
+                }
+            }
+        }
+    }
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        listView = findViewById(R.id.recyclerView)
+        context_c = applicationContext
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            broadcastReceiver, IntentFilter(MESSAGE)
+        )
 
-        fun isLocationEnabled(context: Context): Boolean {
-            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                    locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-        }
+            val stringOrders = mutableListOf<String>()
 
-        fun requestLocationEnabled(context: Context) {
-            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            context.startActivity(intent)
-        }
+            stringOrders+="AAAA"
+            stringOrders+="gggg"
+            stringOrders+="AAAA"
+            stringOrders+="AAAA"
+            stringOrders+="AAAA"
 
-        fun checkLocationStatus(context: Context) {
-            if (!isLocationEnabled(context)) {
-                // Геолокация не включена, предложим включить её
-                requestLocationEnabled(context)
-            } else {
-                // Геолокация включена, продолжаем работу приложения
-                // Здесь можно добавить код для вашего приложения
+
+
+        listView?.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)
+
+        /*var reciver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if ("list_orders" == intent?.action) {
+
+                }
             }
-        }
+        }*/
 
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            SendLocation().requestLocation(this)
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_CODE
-            )
-        }
 
-        val intentFilter = IntentFilter("no_connection")
-        val receiver = MyBroadcastReceiver()
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
+        //val filter = IntentFilter("list_orders")
+        //LocalBroadcastManager.getInstance(this).registerReceiver(reciver, filter)
 
-        val intentFilter2 = IntentFilter("open_new_order")
-        val receiver2 = MyBroadcastReceiver()
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver2, intentFilter2)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            Toast.makeText(this, "Дайте разрешение выводить приложение поверх других окон!", Toast.LENGTH_LONG).show()
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:" + packageName)
-            )
-            startActivity(intent)
-        }
-        val message = intent.getStringExtra("body")
-        if(message!=null){
-            Toast.makeText(this, message,Toast.LENGTH_LONG).show()
-        }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-        ServerPing(this).main()
-        Rabbit(this).startListening()
     }
-
 
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {

@@ -3,11 +3,9 @@ package com.example.courier.rest
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.models.GetSettings
 import com.example.courier.models.Message
-import com.example.courier.models.Setting
 import com.google.gson.Gson
 import com.rabbitmq.client.AMQP
 import com.rabbitmq.client.Channel
@@ -15,14 +13,17 @@ import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import com.rabbitmq.client.DefaultConsumer
 import com.rabbitmq.client.Envelope
-import java.io.IOException
 import java.util.concurrent.Executors
 
 class Rabbit(private var context: Context) {
-    private lateinit var connection: Connection
-    private lateinit var channel: Channel
+    companion object {
+        private var connection: Connection? = null
+        private var channel: Channel? = null
+    }
 
-    fun createFactory(): ConnectionFactory {
+     private val queueName: String? = GetSettings(context).load("token")
+
+    private fun createFactory(): ConnectionFactory {
         val factory = ConnectionFactory()
         factory.host = "192.168.0.166"
         factory.port = 5672
@@ -30,26 +31,32 @@ class Rabbit(private var context: Context) {
         factory.password = "guest"
         return factory
     }
-    fun createConnectionAndChannel() {
+    private fun createConnectionAndChannel() {
         val factory = createFactory()
 
-        while (true) {
+        //while (true) {
             try {
                 connection = factory.newConnection()
-                channel = connection.createChannel()
-                val queueName = "Driver0"
-                channel.queueDeclare(queueName, true, false, false, null)
-                break
+                channel = connection!!.createChannel()
+                channel!!.queueDeclare(queueName, true, false, false, null)
+                //break
             } catch (ex: Exception) {
                 Thread.sleep(5000)
             }
-        }
+        //}
     }
 
     fun startListening() {
+        Log.e("debuggп", "Thread(Runnable) (startListening)")
+        if (connection != null) {
+            return
+        }
         Thread(Runnable {
+            Log.e("debuggп", Thread.activeCount().toString())
+
             createConnectionAndChannel()
 
+            Log.e("debuggп", "token =  $queueName")
             val consumer = object : DefaultConsumer(channel) {
                 override fun handleDelivery(
                     consumerTag: String?,
@@ -57,6 +64,8 @@ class Rabbit(private var context: Context) {
                     properties: AMQP.BasicProperties?,
                     body: ByteArray?
                 ) {
+
+
                         val stringMessage = String(body!!, Charsets.UTF_8)
 //                        NotificationHandler().createNotificationChannel(activity.applicationContext)
 //                        NotificationHandler().showNotification(activity.applicationContext, message, "Новый заказ")
@@ -71,13 +80,15 @@ class Rabbit(private var context: Context) {
 
                     when(message.code){
                         "new_order" ->
-                            if((message.millisecondsSinceEpoch+60000)>=System.currentTimeMillis()){
+                            if((message.millisecondsSinceEpoch+29000)>=System.currentTimeMillis()){
                                 LocalBroadcastManager
                                     .getInstance(context)
                                     .sendBroadcast(Intent("open_new_order").putExtra("body",message.body))
+                                Log.e("debuggп", Thread.activeCount().toString())
                             }
 
                     }
+
 //                    var j = JsonParser().parse(message) as JSONObject
 //                    var a =  j.get("body") as String
 //                    var z = JsonParser().parse(a) as JSONObject
@@ -93,11 +104,12 @@ class Rabbit(private var context: Context) {
 //                        }
                 }
             }
-                channel.basicConsume("Driver0", true, consumer)
+                channel!!.basicConsume(queueName, true, consumer)
         }).start()
     }
 
     fun sendMessage(token:String, code: String, body: String) {
+        Log.e("debuggп", "Thread(Runnable) (send message)")
         Thread(Runnable {
                 val factory = createFactory()
                 val queueName = "back"
@@ -122,7 +134,7 @@ class Rabbit(private var context: Context) {
                     // Закрываем канал и соединение
                     channel.close()
                     connection.close()
-                    Log.e("debuggп", "все ок")
+                    Log.e("debuggп", "отправил сообщение")
             }
 
             executorService.shutdown()

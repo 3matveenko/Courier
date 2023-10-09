@@ -1,6 +1,7 @@
 package com.example.courier.models
 
 import com.google.gson.annotations.SerializedName
+import java.util.Date
 
 data class LoginDriver (
 
@@ -58,6 +59,41 @@ data class LocationMy(
     @SerializedName(value = "longitude")
     val longitude: Double
 )
+
 fun isNotNull(setting: Setting): Boolean {
     return setting.SERVER_NAME != null && setting.RABBIT_SERVER_NAME != null
 }
+
+
+data class Order(
+
+    @SerializedName(value = "id")
+    val id: Long,
+
+    @SerializedName(value = "statusDelivery")
+    val statusDelivery: Int,
+
+    @SerializedName(value = "guid")
+    val guid: String,
+
+    @SerializedName(value = "dateStart")
+    val dateStart : Date,
+
+    @SerializedName(value = "dateEnd")
+    val dateEnd : Date,
+
+    @SerializedName(value = "address")
+    val address:String,
+
+    @SerializedName(value = "phone")
+    val phone: String,
+
+    @SerializedName(value = "current")
+    val current: String,
+
+    @SerializedName(value = "latitude")
+    val latitude: Double,
+
+    @SerializedName(value = "longitude")
+    val longitude:Double,
+)

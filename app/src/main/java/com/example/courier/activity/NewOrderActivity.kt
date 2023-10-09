@@ -20,22 +20,21 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
 import com.example.courier.models.GetSettings
 import com.example.courier.rest.Rabbit
 
 class NewOrderActivity : AppCompatActivity() {
 
-    private lateinit var vibrator: Vibrator
-    private lateinit var mediaPlayer: MediaPlayer
     @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_order)
-        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
-
+        val mediaPlayer = MediaPlayer.create(applicationContext, R.raw.new_order)
+        val vibrator: Vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             // Если разрешение уже есть, устанавливаем флаги и отображаем активность поверх других
             window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
 //            window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
@@ -59,45 +58,51 @@ class NewOrderActivity : AppCompatActivity() {
         val vibrationPattern = longArrayOf(0, 100, 1000, 300, 2000)
         vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern, 0))
 
+        mediaPlayer.start()
 
+        mediaPlayer.isLooping = true
 
         findViewById<Button>(R.id.reject).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.red))
         findViewById<Button>(R.id.accept).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.green))
 
 
-        val message = intent.getStringExtra("body")
-        findViewById<Button>(R.id.reject).setOnClickListener{
-            escape()
-        }
+
 
         findViewById<Button>(R.id.accept).setOnClickListener{
+            val message = intent.getStringExtra("body")
+            val intent = Intent("list_orders")
+            intent.putExtra("body", message)
+            LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+
+            val intentMESSAGE = Intent(HomeActivity.MESSAGE)
+            intentMESSAGE.putExtra("body", message)
+            LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentMESSAGE)
+
             val token = GetSettings(this).load("token").toString()
             Rabbit(this).sendMessage(token,"accept_order","ok")
+            vibrator.cancel()
+            mediaPlayer.release()
+            finish()
         }
 
-        if(message!=null){
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-        }
 
 
-
-        Log.e("debugg", "перед таймером")
-        mediaPlayer = MediaPlayer.create(this, R.raw.new_order)
-        val timer = object : CountDownTimer(20000, 3000) {
-            override fun onTick(millisUntilFinished: Long) {
-                mediaPlayer.start()
-            }
+        val timer = object : CountDownTimer(20000, 1) {
+            override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
-                escape()
+                vibrator.cancel()
+                mediaPlayer.release()
+                this@NewOrderActivity.finish()
             }
         }
+
         timer.start()
 
-    }
-    fun escape(){
-        mediaPlayer.release()
-        vibrator.cancel()
-        finish()
+        findViewById<Button>(R.id.reject).setOnClickListener{
+            vibrator.cancel()
+            mediaPlayer.release()
+            finish()
+        }
     }
 }

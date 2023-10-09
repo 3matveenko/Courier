@@ -43,13 +43,20 @@ class SendLocation {
                     }
                 }
 
-                val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-                val locationRequest = LocationRequest()
-                locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                locationRequest.interval = 60000
-                locationRequest.smallestDisplacement = 50.0f
+             try {
+                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+                 val locationRequest = LocationRequest()
+                 locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                 locationRequest.interval = 60000
+                 locationRequest.smallestDisplacement = 50.0f
 
-                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+             } catch (e: Exception){
+                 Toast.makeText(context.applicationContext, "Ошибка передачи координат", Toast.LENGTH_LONG).show()
+             }
+
+
+
         }
     }
 }
