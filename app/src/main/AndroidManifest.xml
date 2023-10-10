@@ -5,10 +5,9 @@
     <uses-permission android:name="android.permission.NOTIFICATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -17,6 +16,7 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -28,6 +28,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Courier"
         tools:targetApi="31">
+        <activity
+            android:name=".activity.DetailsActivity"
+            android:exported="false" />
         <activity
             android:name=".activity.NewOrderActivity"
             android:exported="false"

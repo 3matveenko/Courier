@@ -7,14 +7,15 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Process
-import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
 import com.example.courier.models.Order
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Modifier
@@ -23,14 +24,21 @@ import kotlin.system.exitProcess
 
 
 class HomeActivity : AppCompatActivity() {
-    //private var orders: List<Order?>? = emptyList()
 
     companion object {
         @SuppressLint("StaticFieldLeak")
-        private var listView: ListView? = null
-        @SuppressLint("StaticFieldLeak")
-        private var context_c: Context? = null
         private var orders: List<Order?>? = emptyList()
+
+        val gson: Gson = GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+            .excludeFieldsWithModifiers(
+                Modifier.STATIC,
+                Modifier.TRANSIENT,
+                Modifier.VOLATILE
+            )
+            .create()
+
+        private val stringOrders: MutableList<String> = mutableListOf()
 
         const val MESSAGE: String = "MESSAGE"
 
@@ -38,48 +46,26 @@ class HomeActivity : AppCompatActivity() {
             override fun onReceive(context: Context, intent: Intent) {
 
                 val message = intent.getStringExtra("body")
-                Log.e("debuggп", "message null")
                 if (message != null) {
-                    Log.e("debuggп", "message не null")
-
-                    /*val gson = GsonBuilder()
-                        .registerTypeAdapter(
-                            Date::class.java,
-                            JsonDeserializer<Date> { json, _, _ ->
-                                try {
-                                    val format: DateFormat =
-                                        SimpleDateFormat("MMM d, yyyy, h:mm:ss a")
-                                    format.parse(json.asString)
-                                } catch (e: ParseException) {
-                                    null
-                                }
-                            })
-                        .create()*/
-
                     val gson = GsonBuilder()
-                        .setDateFormat("MMM d, yyyy, h:mm:ss a")
+                        .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                         .excludeFieldsWithModifiers(
                             Modifier.STATIC,
                             Modifier.TRANSIENT,
                             Modifier.VOLATILE
                         )
                         .create()
-
                     val deliveryInfoListType: Type =
                         object : TypeToken<List<Order?>?>() {}.type
                     orders = gson.fromJson(message, deliveryInfoListType)
                 }
+                stringOrders.clear()
 
-                val stringOrders = mutableListOf<String>()
                 if (orders?.isNotEmpty() == true) {
                     orders?.forEach {
-                        stringOrders.add(it!!.current)
-                    }
-
-                    if (listView != null) {
-                        listView!!.findViewById<ListView>(R.id.recyclerView).adapter =
-                            context_c?.let { ArrayAdapter(it, android.R.layout.simple_list_item_1, stringOrders)
-                            }
+                        if (it != null) {
+                            stringOrders.add(it.address)
+                        }
                     }
                 }
             }
@@ -92,37 +78,25 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        listView = findViewById(R.id.recyclerView)
-        context_c = applicationContext
-
         LocalBroadcastManager.getInstance(this).registerReceiver(
             broadcastReceiver, IntentFilter(MESSAGE)
         )
 
-            val stringOrders = mutableListOf<String>()
+        if (stringOrders.isEmpty()) {
 
-            stringOrders+="AAAA"
-            stringOrders+="gggg"
-            stringOrders+="AAAA"
-            stringOrders+="AAAA"
-            stringOrders+="AAAA"
+        }
 
+        findViewById<ListView>(R.id.recyclerView).adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)
 
+        findViewById<ListView>(R.id.recyclerView).setOnItemClickListener { _, _, position, _ ->
 
-        listView?.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)
+            val jsonOrder:String = gson.toJson(orders?.get(position))
 
-        /*var reciver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                if ("list_orders" == intent?.action) {
-
-                }
-            }
-        }*/
-
-
-        //val filter = IntentFilter("list_orders")
-        //LocalBroadcastManager.getInstance(this).registerReceiver(reciver, filter)
-
+            val intent = Intent(this, DetailsActivity::class.java)
+            intent.putExtra("order", jsonOrder)
+            startActivity(intent)
+            Toast.makeText(this,  jsonOrder, Toast.LENGTH_SHORT).show()
+        }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
