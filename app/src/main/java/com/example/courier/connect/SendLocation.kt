@@ -1,10 +1,19 @@
-package com.example.courier.rest
+package com.example.courier.connect
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LocationMy
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -14,10 +23,41 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 
-class SendLocation {
+class SendLocation(context: Context) : LocationListener {
 
+    private val _context:Context = context
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    override fun onLocationChanged(location: Location) {
+    }
+
+     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+    }
+
+    fun request(){
+        while (true){
+            Thread.sleep(10000)
+            checkLocationStatus(_context)
+        }
+    }
+
+    fun isLocationEnabled(context: Context): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    fun checkLocationStatus(context: Context) {
+        if (!isLocationEnabled(context)) {
+            requestLocationEnabled(context)
+        }
+    }
+
+    fun requestLocationEnabled(context: Context) {
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        context.startActivity(intent)
+    }
     fun requestLocation(context:Context) {
+
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
          if (ActivityCompat.checkSelfPermission(
                     context,
@@ -54,9 +94,6 @@ class SendLocation {
              } catch (e: Exception){
                  Toast.makeText(context.applicationContext, "Ошибка передачи координат", Toast.LENGTH_LONG).show()
              }
-
-
-
         }
     }
 }

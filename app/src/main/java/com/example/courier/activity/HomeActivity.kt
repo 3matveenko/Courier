@@ -27,6 +27,12 @@ class HomeActivity : AppCompatActivity() {
 
     companion object {
         @SuppressLint("StaticFieldLeak")
+        lateinit var ll:ListView
+
+        @SuppressLint("StaticFieldLeak")
+        lateinit var _context: Context
+
+        @SuppressLint("StaticFieldLeak")
         private var orders: List<Order?>? = emptyList()
 
         val gson: Gson = GsonBuilder()
@@ -68,6 +74,11 @@ class HomeActivity : AppCompatActivity() {
                         }
                     }
                 }
+                if (::ll.isInitialized) {
+                    ll.adapter =
+                        ArrayAdapter(_context, android.R.layout.simple_list_item_1, stringOrders)
+                }
+                var a :Int = 5
             }
         }
     }
@@ -77,18 +88,19 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
         LocalBroadcastManager.getInstance(this).registerReceiver(
             broadcastReceiver, IntentFilter(MESSAGE)
         )
 
+        _context = this
+
         if (stringOrders.isEmpty()) {
-
+            val a : Int = 5
         }
+        ll = findViewById<ListView>(R.id.recyclerView)
+        ll.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)
 
-        findViewById<ListView>(R.id.recyclerView).adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)
-
-        findViewById<ListView>(R.id.recyclerView).setOnItemClickListener { _, _, position, _ ->
+        ll.setOnItemClickListener { _, _, position, _ ->
 
             val jsonOrder:String = gson.toJson(orders?.get(position))
 

@@ -17,8 +17,9 @@ class GetSettings(context: Context) {
     init {
         sharedPreferences = context.getSharedPreferences("courier", Context.MODE_PRIVATE)
     }
-    fun load(key: String): String? {
-        return  sharedPreferences.getString(key, "")
+
+    fun load(key: String): String {
+        return sharedPreferences.getString(key, "") ?: return ""
     }
 
     @SuppressLint("CommitPrefEdits")

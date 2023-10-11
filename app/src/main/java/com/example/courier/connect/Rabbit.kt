@@ -1,4 +1,4 @@
-package com.example.courier.rest
+package com.example.courier.connect
 
 import android.content.Context
 import android.content.Intent
@@ -34,7 +34,6 @@ class Rabbit(private var context: Context) {
     private fun createConnectionAndChannel() {
         val factory = createFactory()
 
-        //while (true) {
             try {
                 connection = factory.newConnection()
                 channel = connection!!.createChannel()
@@ -43,20 +42,14 @@ class Rabbit(private var context: Context) {
             } catch (ex: Exception) {
                 Thread.sleep(5000)
             }
-        //}
     }
 
     fun startListening() {
-        Log.e("debuggп", "Thread(Runnable) (startListening)")
         if (connection != null) {
             return
         }
         Thread(Runnable {
-            Log.e("debuggп", Thread.activeCount().toString())
-
             createConnectionAndChannel()
-
-            Log.e("debuggп", "token =  $queueName")
             val consumer = object : DefaultConsumer(channel) {
                 override fun handleDelivery(
                     consumerTag: String?,
@@ -66,17 +59,10 @@ class Rabbit(private var context: Context) {
                 ) {
 
 
-                        val stringMessage = String(body!!, Charsets.UTF_8)
-//                        NotificationHandler().createNotificationChannel(activity.applicationContext)
-//                        NotificationHandler().showNotification(activity.applicationContext, message, "Новый заказ")
-
-                    Log.e("debugg", "получил сообщение вызвал бродкаст $stringMessage")
+                    val stringMessage = String(body!!, Charsets.UTF_8)
 
                     val gson = Gson()
                     val message = gson.fromJson(stringMessage, Message::class.java)
-                    Log.e("debugg", "код ${message.code}")
-                    Log.e("debugg", "миллисекунды ${message.millisecondsSinceEpoch}")
-                    Log.e("debugg", "боди ${message.body}")
 
                     when(message.code){
                         "new_order" ->
@@ -86,22 +72,11 @@ class Rabbit(private var context: Context) {
                                     .sendBroadcast(Intent("open_new_order").putExtra("body",message.body))
                                 Log.e("debuggп", Thread.activeCount().toString())
                             }
-
+                        "get_my_orders_status_progressing" ->
+                            LocalBroadcastManager
+                                .getInstance(context)
+                                .sendBroadcast(Intent("my_orders").putExtra("body",message.body))
                     }
-
-//                    var j = JsonParser().parse(message) as JSONObject
-//                    var a =  j.get("body") as String
-//                    var z = JsonParser().parse(a) as JSONObject
-
-                    //Log.e("debugg", "состав сообщения $z")
-
-
-
-//                        val handler = Handler(Looper.getMainLooper())
-//                        handler.post {
-//                            Toast.makeText(activity.applicationContext, message, Toast.LENGTH_LONG)
-//                                .show()
-//                        }
                 }
             }
                 channel!!.basicConsume(queueName, true, consumer)
@@ -109,7 +84,6 @@ class Rabbit(private var context: Context) {
     }
 
     fun sendMessage(token:String, code: String, body: String) {
-        Log.e("debuggп", "Thread(Runnable) (send message)")
         Thread(Runnable {
                 val factory = createFactory()
                 val queueName = "back"
@@ -124,21 +98,12 @@ class Rabbit(private var context: Context) {
             executorService.execute {
                     val connection = factory.newConnection()
                     val channel = connection.createChannel()
-
-                    // Объявляем очередь, если она еще не создана
                     channel.queueDeclare(queueName, true, false, false, null)
-
-                    // Отправляем сообщение
                     channel.basicPublish("", queueName, null, message.toByteArray())
-
-                    // Закрываем канал и соединение
                     channel.close()
                     connection.close()
-                    Log.e("debuggп", "отправил сообщение")
             }
-
             executorService.shutdown()
-
         }).start()
     }
-    }
+}

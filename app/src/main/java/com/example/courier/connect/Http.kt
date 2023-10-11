@@ -1,4 +1,4 @@
-package com.example.courier.rest
+package com.example.courier.connect
 
 import android.annotation.SuppressLint
 import android.content.Intent

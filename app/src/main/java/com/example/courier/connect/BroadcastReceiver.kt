@@ -1,12 +1,11 @@
-package com.example.courier.rest
+package com.example.courier.connect
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
-import android.util.Log
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.courier.activity.HomeActivity
 import com.example.courier.activity.NewOrderActivity
 
 class MyBroadcastReceiver: BroadcastReceiver() {
@@ -21,7 +20,13 @@ class MyBroadcastReceiver: BroadcastReceiver() {
                 val message = intent.getStringExtra("body")
                 newOrderIntent.putExtra("body", message)
                 newOrderIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context?.startActivity(newOrderIntent)
+                context.startActivity(newOrderIntent)
+            }
+            if(intent?.action=="my_orders"){
+                val message = intent.getStringExtra("body")
+                val intentMESSAGE = Intent(HomeActivity.MESSAGE)
+                intentMESSAGE.putExtra("body", message)
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intentMESSAGE)
             }
         }
     }

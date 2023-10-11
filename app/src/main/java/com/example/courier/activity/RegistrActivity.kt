@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat
 import com.example.courier.R
 import com.example.courier.models.CreateDriver
 import com.example.courier.models.GetSettings
-import com.example.courier.rest.Http
+import com.example.courier.connect.Http
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 

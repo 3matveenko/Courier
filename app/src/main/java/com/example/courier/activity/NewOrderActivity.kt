@@ -4,26 +4,22 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.provider.Settings
-import android.util.Log
 import android.view.WindowManager
 import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
 import com.example.courier.models.GetSettings
-import com.example.courier.rest.Rabbit
+import com.example.courier.connect.Rabbit
 
 class NewOrderActivity : AppCompatActivity() {
 
@@ -35,13 +31,7 @@ class NewOrderActivity : AppCompatActivity() {
 
         val mediaPlayer = MediaPlayer.create(applicationContext, R.raw.new_order)
         val vibrator: Vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            // Если разрешение уже есть, устанавливаем флаги и отображаем активность поверх других
-            window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
-//            window.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
-//            window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-
-            // Вставьте здесь код для отображения содержимого вашей активности
-
+        window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
 
         val imageView = findViewById<ImageView>(R.id.imageView)
         val translationAnimation = TranslateAnimation(
@@ -70,9 +60,6 @@ class NewOrderActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.accept).setOnClickListener{
             val message = intent.getStringExtra("body")
-            val intent = Intent("list_orders")
-            intent.putExtra("body", message)
-            LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
 
             val intentMESSAGE = Intent(HomeActivity.MESSAGE)
             intentMESSAGE.putExtra("body", message)

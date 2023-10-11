@@ -1,8 +1,7 @@
-package com.example.courier.rest
+package com.example.courier.connect
 
 import com.example.courier.models.CreateDriver
 import com.example.courier.models.LoginDriver
-import com.example.courier.models.Token
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Headers
