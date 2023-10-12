@@ -5,16 +5,24 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.Switch
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
+import com.example.courier.connect.Http
+import com.example.courier.models.GetSettings
+import com.example.courier.models.Message
 import com.example.courier.models.Order
+import com.google.android.gms.common.api.internal.StatusCallback
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -85,9 +93,23 @@ class HomeActivity : AppCompatActivity() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    @SuppressLint("ResourceAsColor", "CutPasteId", "UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        val switch = findViewById<Switch>(R.id.switchView)
+        val colorGreen = resources.getColor(R.color.green, theme)
+        val colorRed = resources.getColor(R.color.red,theme)
+
+        val token:String = GetSettings(this).load("token")
+        Http(this@HomeActivity).statusDay(Message(token,"",0,""))
+
+
+        switch.setTextColor(colorRed)
+
+        val thumbColor = ColorStateList.valueOf(colorRed)
+        switch.thumbTintList = thumbColor
         LocalBroadcastManager.getInstance(this).registerReceiver(
             broadcastReceiver, IntentFilter(MESSAGE)
         )

@@ -8,6 +8,8 @@ class GetSettings(context: Context) {
 
     companion object {
 
+        const val HTTP_TOKEN:String = "gYIABBFGDkyCwg"
+
         const val SERVER_NAME:String = "server_name"
 
         const val RABBIT_SERVER_NAME = "rabbit_server_name"

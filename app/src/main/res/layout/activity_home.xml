@@ -13,8 +13,19 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/base_color"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="Заголовок активности"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints">
+
+        <Switch
+            android:id="@+id/switchView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:paddingEnd="16dp"
+            android:textSize="20sp"
+            tools:ignore="InvalidId"
+            tools:layout_editor_absoluteX="349dp"
+            tools:layout_editor_absoluteY="18dp" />
+    </androidx.appcompat.widget.Toolbar>
 
     <ListView
         android:id="@+id/recyclerView"

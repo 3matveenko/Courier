@@ -1,14 +1,23 @@
 package com.example.courier.connect
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.os.Build
 import android.util.Log
+import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.example.courier.R
 import com.example.courier.activity.HomeActivity
 import com.example.courier.models.CreateDriver
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LoginDriver
+import com.example.courier.models.Message
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.zxing.integration.android.IntentIntegrator
@@ -100,6 +109,42 @@ class Http(private var activity: AppCompatActivity) {
                 integrator.setOrientationLocked(false)
                 integrator.setPrompt("Отсканируйте QR-код у администратора")
                 integrator.initiateScan()
+            }
+        })
+    }
+
+    fun statusDay(message: Message) {
+        this.api.statusDay(message).enqueue(object : Callback<String> {
+            @RequiresApi(Build.VERSION_CODES.M)
+            @SuppressLint("CutPasteId", "SetTextI18n", "SimpleDateFormat")
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    val switch = (activity as Activity).findViewById<Switch>(R.id.switchView)
+                    val colorGreen = ContextCompat.getColor(activity, R.color.green)
+                    val colorRed = ContextCompat.getColor(activity, R.color.red)
+
+                    if (responseBody == "false") {
+                        switch.text = "Занят"
+                        switch.setTextColor(colorRed)
+                        val thumbColor = ColorStateList.valueOf(colorRed)
+                        switch.thumbTintList = thumbColor
+                        Toast.makeText(activity, "Занят", Toast.LENGTH_LONG).show()
+                    } else if (responseBody == "true") {
+                        switch.text = "Свободен"
+                        switch.setTextColor(colorGreen)
+                        val thumbColor = ColorStateList.valueOf(colorGreen)
+                        switch.thumbTintList = thumbColor
+                        Toast.makeText(activity, "Свободен", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(activity, "Response Body: $responseBody", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(activity, "Не удалось выполнить запрос. Код ошибки: ${response.code()}", Toast.LENGTH_LONG).show()
+                }
+            }
+            override fun onFailure(call: Call<String>, throwable: Throwable) {
+                Toast.makeText(activity, "fail", Toast.LENGTH_LONG).show()
             }
         })
     }

@@ -33,7 +33,6 @@ class Rabbit(private var context: Context) {
     }
     private fun createConnectionAndChannel() {
         val factory = createFactory()
-
             try {
                 connection = factory.newConnection()
                 channel = connection!!.createChannel()
