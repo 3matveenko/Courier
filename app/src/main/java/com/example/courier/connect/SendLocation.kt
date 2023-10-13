@@ -11,6 +11,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -78,7 +79,8 @@ class SendLocation(context: Context) : LocationListener {
 
                         val gson = Gson()
                         val body = gson.toJson(LocationMy(latitude, longitude))
-                        val token = GetSettings(context).load("token").toString()
+                        val token = GetSettings(context).load("token")
+                        Log.d("courier_log", "SendLocation передал координаты в Rabbit для отправки")
                         Rabbit(context).sendMessage(token,"location",body)
                     }
                 }
@@ -89,10 +91,10 @@ class SendLocation(context: Context) : LocationListener {
                  locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
                  locationRequest.interval = 60000
                  locationRequest.smallestDisplacement = 50.0f
-
                  fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
              } catch (e: Exception){
-                 Toast.makeText(context.applicationContext, "Ошибка передачи координат", Toast.LENGTH_LONG).show()
+                 Log.e("courier_log", "SendLocation Ошибка получения координат")
+                 Toast.makeText(context.applicationContext, "Ошибка получения координат", Toast.LENGTH_LONG).show()
              }
         }
     }

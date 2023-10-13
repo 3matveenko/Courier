@@ -7,12 +7,28 @@ import android.content.SharedPreferences
 class GetSettings(context: Context) {
 
     companion object {
+        //const
+        const val TOKEN = "token"
 
-        const val HTTP_TOKEN:String = "gYIABBFGDkyCwg"
+        const val HTTP_TOKEN = "gYIABBFGDkyCwg"
+        //var
+        const val PROTOCOL = "protocol"
 
-        const val SERVER_NAME:String = "server_name"
+        const val BACK_QUEUE_NAME = "back_queue_name"
+
+        const val SERVER_NAME = "server_name"
+
+        const val SERVER_PORT = "server_port"
 
         const val RABBIT_SERVER_NAME = "rabbit_server_name"
+
+        const val RABBIT_SERVER_PORT = "rabbit_server_port"
+
+        const val RABBIT_USERNAME = "rabbit_username"
+
+        const val RABBIT_PASSWORD = "rabbit_password"
+
+
 
     }
     private var sharedPreferences: SharedPreferences

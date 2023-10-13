@@ -9,13 +9,16 @@ import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.os.Process
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Switch
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
 import com.example.courier.connect.Http
@@ -98,18 +101,24 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-        val switch = findViewById<Switch>(R.id.switchView)
-        val colorGreen = resources.getColor(R.color.green, theme)
-        val colorRed = resources.getColor(R.color.red,theme)
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        var switch = toolbar.getChildAt(0) as Switch
+        //val switch = toolbar.findViewById<Switch>(R.id.switchView)
+        switch.text = "Нет интернета"
 
         val token:String = GetSettings(this).load("token")
-        Http(this@HomeActivity).statusDay(Message(token,"",0,""))
 
+        Thread(Runnable {
 
-        switch.setTextColor(colorRed)
+            Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),false)
+        }).start()
 
-        val thumbColor = ColorStateList.valueOf(colorRed)
-        switch.thumbTintList = thumbColor
+        switch.setOnClickListener{
+            Log.e("courier_log",Thread.activeCount().toString())
+            Thread(Runnable {
+            Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),true)
+            }).start()
+        }
         LocalBroadcastManager.getInstance(this).registerReceiver(
             broadcastReceiver, IntentFilter(MESSAGE)
         )

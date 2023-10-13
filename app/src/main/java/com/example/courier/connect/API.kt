@@ -6,6 +6,7 @@ import com.example.courier.models.LoginDriver
 import com.example.courier.models.Message
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
@@ -21,5 +22,6 @@ interface API {
 
     @Headers("Content-Type: application/json;charset=UTF-8","Authorization: $HTTP_TOKEN")
     @POST("/app/status_day")
-    fun statusDay(@Body query: Message): Call<String>
+    fun statusDay(@Header("Flag") flag: Boolean, @Body query: Message): Call<String>
+
 }

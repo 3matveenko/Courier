@@ -30,11 +30,30 @@ data class Token(
 )
 
 data class Setting(
+
+    @SerializedName(value = "protocol")
+    val protocol:String,
+
     @SerializedName(value = "server_name")
-    val SERVER_NAME:String,
+    val serverName:String,
+
+    @SerializedName(value = "server_port")
+    val serverPort : String,
+
+    @SerializedName(value = "back_queue_name")
+    val backQueueName : String,
 
     @SerializedName(value = "rabbit_server_name")
-    val RABBIT_SERVER_NAME:String
+    val rabbitServerName:String,
+
+    @SerializedName(value = "rabbit_server_port")
+     val rabbitServerPort : String,
+
+    @SerializedName(value = "rabbit_username")
+     val rabbitUsername : String,
+
+    @SerializedName(value = "rabbit_password")
+     val rabbitPassword : String,
 )
 
 data class Message(
@@ -61,7 +80,7 @@ data class LocationMy(
 )
 
 fun isNotNull(setting: Setting): Boolean {
-    return setting.SERVER_NAME != null && setting.RABBIT_SERVER_NAME != null
+    return setting.serverName != null && setting.rabbitServerName != null
 }
 
 

@@ -24,11 +24,10 @@ import com.example.courier.connect.MyBroadcastReceiver
 import com.example.courier.connect.Rabbit
 import com.example.courier.connect.SendLocation
 import com.example.courier.models.GetSettings
+import com.example.courier.models.GetSettings.Companion.TOKEN
 import com.example.courier.models.LoginDriver
 import com.example.courier.models.Setting
 import com.example.courier.models.isNotNull
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
@@ -39,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
-
+        Log.d("courier_log", "***START app Courier***")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Toast.makeText(this, "Дайте разрешение выводить приложение поверх других окон!", Toast.LENGTH_LONG).show()
             val intent = Intent(
@@ -49,20 +48,20 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        Log.d("run_log_courier", "вызвал startListening из MainActivity")
-        Rabbit(applicationContext).startListening()
-
         broadcastIni()
 
-        Thread(Runnable {
-            SendLocation(this).request()
-        }).start()
-
-        var token = GetSettings(this).load("token")
-
+        var token = GetSettings(this).load(TOKEN)
+        Log.d("courier_log", "token = $token")
         if (token != ""){
             Rabbit(applicationContext).sendMessage(token,"get_my_orders_status_progressing","")
+            Rabbit(applicationContext).startListening()
+            Thread(Runnable {
+                SendLocation(this).request()
+            }).start()
             startActivity(Intent(this@MainActivity, HomeActivity::class.java))
+        } else {
+            Log.e("courier_log", "token не обнаружен")
+            startQr()
         }
 
         findViewById<Button>(R.id.but_registr).setOnClickListener {
@@ -131,17 +130,28 @@ class MainActivity : AppCompatActivity() {
 
         if (result != null) {
             if (result.contents == null) {
-                // Если сканирование было отменено
                 Toast.makeText(this, "Сканирование отменено", Toast.LENGTH_SHORT).show()
                 finish()
             } else {
-                val gson = Gson()
-                val setting:Setting = gson.fromJson(result.contents, Setting::class.java)
-                 if(isNotNull(setting)){
-                     GetSettings(applicationContext).save(GetSettings.SERVER_NAME,setting.SERVER_NAME)
-                     GetSettings(applicationContext).save(GetSettings.RABBIT_SERVER_NAME,setting.RABBIT_SERVER_NAME)
-                     Toast.makeText(this, GetSettings(applicationContext).load(GetSettings.SERVER_NAME),Toast.LENGTH_LONG).show()
-                 }
+                try {
+                    val gson = Gson()
+                    val setting:Setting = gson.fromJson(result.contents, Setting::class.java)
+                    if(isNotNull(setting)){
+                        GetSettings(applicationContext).save(GetSettings.PROTOCOL,setting.protocol)
+                        GetSettings(applicationContext).save(GetSettings.BACK_QUEUE_NAME,setting.backQueueName)
+                        GetSettings(applicationContext).save(GetSettings.SERVER_NAME,setting.serverName)
+                        GetSettings(applicationContext).save(GetSettings.SERVER_PORT,setting.serverPort)
+                        GetSettings(applicationContext).save(GetSettings.RABBIT_SERVER_NAME,setting.rabbitServerName)
+                        GetSettings(applicationContext).save(GetSettings.RABBIT_SERVER_PORT,setting.rabbitServerPort)
+                        GetSettings(applicationContext).save(GetSettings.RABBIT_USERNAME,setting.rabbitUsername)
+                        GetSettings(applicationContext).save(GetSettings.RABBIT_PASSWORD,setting.rabbitPassword)
+                        Toast.makeText(this, "QR-код отсканирован", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e : Exception){
+                    Log.e("courier_log", "QR-код не распознан")
+                    Toast.makeText(this, "QR-код не распознан", Toast.LENGTH_SHORT).show()
+                }
+
                 this.recreate()
             }
         }
