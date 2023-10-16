@@ -21,6 +21,7 @@ import com.example.courier.activity.HomeActivity
 import com.example.courier.activity.RegistrActivity
 import com.example.courier.connect.Http
 import com.example.courier.connect.MyBroadcastReceiver
+import com.example.courier.connect.PingServer
 import com.example.courier.connect.Rabbit
 import com.example.courier.connect.SendLocation
 import com.example.courier.models.GetSettings
@@ -34,10 +35,16 @@ import com.google.zxing.integration.android.IntentResult
 
 class MainActivity : AppCompatActivity() {
 
+    companion object{
+        var connectionFlag:Boolean = false
+    }
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
+        Thread(Runnable {
+            PingServer(this).connection()
+        }).start()
         Log.d("courier_log", "***START app Courier***")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Toast.makeText(this, "Дайте разрешение выводить приложение поверх других окон!", Toast.LENGTH_LONG).show()

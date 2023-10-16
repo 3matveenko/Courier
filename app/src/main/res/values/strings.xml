@@ -13,4 +13,9 @@
     <string name="title_activity_new_order">вам поступил новый заказ</string>
     <string name="accept">Принять</string>
     <string name="reject">Отклонить</string>
+    <string name="address_delivery">Адрес доставки</string>
+    <string name="current_name">Имя клиента</string>
+    <string name="orders_number">Номер заказа</string>
+    <string name="add_time_title">Принят</string>
+    <string name="phone_number_title">Номер телефона</string>
 </resources>

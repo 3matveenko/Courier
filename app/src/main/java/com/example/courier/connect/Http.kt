@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.activity.HomeActivity
 import com.example.courier.models.CreateDriver
@@ -45,7 +46,7 @@ class Http(private var activity: AppCompatActivity) {
     init {
         do {
             var flag = false
-            if (PingServer(activity).connection()) {
+            if (MainActivity.connectionFlag) {
                 val server: String =
                     GetSettings(activity).load(GetSettings.PROTOCOL) +
                             GetSettings(activity).load(GetSettings.SERVER_NAME) + ":" +

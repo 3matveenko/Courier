@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Courier" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/base_color</item>
+        <item name="detailsTitle">@color/grayL</item>
     </style>
-
     <style name="Theme.Courier" parent="Base.Theme.Courier" />
 </resources>

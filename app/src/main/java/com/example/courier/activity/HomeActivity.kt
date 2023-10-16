@@ -89,7 +89,6 @@ class HomeActivity : AppCompatActivity() {
                     ll.adapter =
                         ArrayAdapter(_context, android.R.layout.simple_list_item_1, stringOrders)
                 }
-                var a :Int = 5
             }
         }
     }
@@ -102,18 +101,17 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        var switch = toolbar.getChildAt(0) as Switch
-        //val switch = toolbar.findViewById<Switch>(R.id.switchView)
+        //var switch = toolbar.getChildAt(0) as Switch
+        val switch = findViewById<Switch>(R.id.switchView)
         switch.text = "Нет интернета"
 
         val token:String = GetSettings(this).load("token")
 
         Thread(Runnable {
-
             Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),false)
         }).start()
 
-        switch.setOnClickListener{
+        switch.setOnCheckedChangeListener { _, _ ->
             Log.e("courier_log",Thread.activeCount().toString())
             Thread(Runnable {
             Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),true)
@@ -126,7 +124,7 @@ class HomeActivity : AppCompatActivity() {
         _context = this
 
         if (stringOrders.isEmpty()) {
-            val a : Int = 5
+
         }
         ll = findViewById<ListView>(R.id.recyclerView)
         ll.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.courier.MainActivity.Companion.connectionFlag
 import com.example.courier.models.GetSettings
 import com.example.courier.models.GetSettings.Companion.TOKEN
 import com.example.courier.models.Message
@@ -53,7 +54,7 @@ class Rabbit(private var context: Context) {
         Thread(Runnable {
             do {
                 var flag = false
-                if(PingServer(context).connection()){
+                if(connectionFlag){
                     Log.d("courier_log", "Rabbit startListening ok")
                     createConnectionAndChannel()
                     val consumer = object : DefaultConsumer(channel) {
@@ -96,7 +97,7 @@ class Rabbit(private var context: Context) {
         Thread(Runnable {
             do {
                 var flag = false
-                if(PingServer(context).connection()){
+                if(connectionFlag){
                 val factory = createFactory()
                 val queueName = GetSettings(context).load(GetSettings.BACK_QUEUE_NAME)
 
