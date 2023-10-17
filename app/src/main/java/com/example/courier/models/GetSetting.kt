@@ -45,7 +45,13 @@ class GetSettings(context: Context) {
         val sharedPreferencesEditor = sharedPreferences.edit()
         sharedPreferencesEditor.putString(key, string)
         sharedPreferencesEditor.apply()
+    }
 
+    @SuppressLint("CommitPrefEdits")
+    fun remove(key: String) {
+        val sharedPreferencesEditor = sharedPreferences.edit()
+        sharedPreferencesEditor.remove(key)
+        sharedPreferencesEditor.apply()
     }
 
     fun isNull(key: String): Boolean {

@@ -7,6 +7,18 @@
     tools:context=".activity.DetailsActivity">
 
     <View
+        android:id="@+id/lineView6"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_centerInParent="true"
+        android:background="?attr/detailsTitle"
+        app:layout_constraintBottom_toTopOf="@+id/address_delivery"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <View
         android:id="@+id/lineView5"
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -47,11 +59,12 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_centerInParent="true"
+        android:layout_marginTop="5dp"
         android:background="?attr/detailsTitle"
-        app:layout_constraintBottom_toTopOf="@+id/address_delivery"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/address_text"
         tools:ignore="MissingConstraints" />
 
     <TextView
@@ -59,7 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="5dp"
         android:text="@string/current_name"
         android:textColor="?attr/detailsTitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,8 +82,9 @@
         android:id="@+id/current_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="25dp"
+        android:text="textView"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/current_title" />
@@ -92,7 +106,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="5dp"
         android:text="@string/address_delivery"
         android:textColor="?attr/detailsTitle"
         app:layout_constraintEnd_toEndOf="parent"
@@ -105,9 +119,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="5dp"
         android:paddingStart="25dp"
         android:paddingEnd="25dp"
+        android:textAlignment="textEnd"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/address_delivery"
@@ -118,7 +133,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="5dp"
         android:text="@string/orders_number"
         android:textColor="?attr/detailsTitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -128,7 +143,7 @@
         android:id="@+id/orders_number_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="25dp"
         android:text="textView"
         android:textSize="20sp"
@@ -140,7 +155,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="12dp"
         android:text="@string/add_time_title"
         android:textColor="?attr/detailsTitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -150,7 +164,7 @@
         android:id="@+id/time_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="25dp"
         android:text="TextView"
         android:textSize="20sp"
@@ -162,7 +176,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="5dp"
         android:text="@string/phone_number_title"
         android:textColor="?attr/detailsTitle"
         app:layout_constraintStart_toStartOf="parent"
@@ -172,10 +186,66 @@
         android:id="@+id/phone_number_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="25dp"
         android:text="TextView"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phone_number_title" />
+
+    <Button
+        android:id="@+id/reject_in_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="@color/red"
+        android:text="@string/reject"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/address_text" />
+
+    <Button
+        android:id="@+id/send_sms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/base_color"
+        android:text="@string/send_sms"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/address_text" />
+
+    <Button
+        android:id="@+id/back_from_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginBottom="25dp"
+        android:text="@string/back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:backgroundTint="@color/base_color"/>
+
+    <EditText
+        android:id="@+id/editCode"
+        android:layout_width="120dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="-90dp"
+        android:ems="10"
+        android:hint="@string/code"
+        android:inputType="text"
+        app:layout_constraintBottom_toBottomOf="@+id/reject_in_details"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/checkButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="-90dp"
+        android:backgroundTint="@color/base_color"
+        android:text="@string/check"
+        app:layout_constraintBottom_toBottomOf="@+id/send_sms"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

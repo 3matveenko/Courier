@@ -65,7 +65,6 @@ class RegistrActivity : AppCompatActivity() {
 
         if (result != null) {
             if (result.contents == null) {
-                // Если сканирование было отменено
                 Toast.makeText(this, "Сканирование отменено", Toast.LENGTH_SHORT).show()
                 finish()
             } else {

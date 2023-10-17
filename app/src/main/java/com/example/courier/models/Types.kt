@@ -116,3 +116,12 @@ data class Order(
     @SerializedName(value = "longitude")
     val longitude:Double,
 )
+
+data class SendSms(
+
+    @SerializedName(value = "phone")
+    val phone: String,
+
+    @SerializedName(value = "code")
+    val code: String,
+)
