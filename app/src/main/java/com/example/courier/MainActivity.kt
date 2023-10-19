@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                     child.visibility = View.GONE
                 }
 
-                findViewById<ProgressBar>(R.id.progressBar).visibility = View.VISIBLE
+                findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility = View.VISIBLE
                 Http(this ).login(LoginDriver(login, password))
             }
         }

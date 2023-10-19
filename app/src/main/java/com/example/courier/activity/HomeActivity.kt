@@ -9,16 +9,21 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.util.Log
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.ProgressBar
 import android.widget.Switch
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.connect.Http
+import com.example.courier.connect.Rabbit
 import com.example.courier.models.GetSettings
 import com.example.courier.models.Message
 import com.example.courier.models.Order
@@ -33,8 +38,14 @@ import kotlin.system.exitProcess
 class HomeActivity : AppCompatActivity() {
 
     companion object {
+
         @SuppressLint("StaticFieldLeak")
         lateinit var ll:ListView
+
+        @SuppressLint("StaticFieldLeak")
+        lateinit var textViewNoOrders:TextView
+
+        lateinit var progressBar:ProgressBar
 
         @SuppressLint("StaticFieldLeak")
         lateinit var _context: Context
@@ -75,12 +86,20 @@ class HomeActivity : AppCompatActivity() {
                 stringOrders.clear()
 
                 if (orders?.isNotEmpty() == true) {
+                    textViewNoOrders.visibility = View.GONE
+                    progressBar.visibility = View.GONE
                     orders?.forEach {
                         if (it != null) {
                             stringOrders.add(it.address)
                         }
                     }
+                } else{
+                    ll.visibility = View.GONE
+                    textViewNoOrders.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
+                var countOrders = orders?.size
+                Log.d("courier_log", "перезаписал адаптер(HomeActivity), в массеве $countOrders элементов")
                 if (::ll.isInitialized) {
                     ll.adapter =
                         ArrayAdapter(_context, android.R.layout.simple_list_item_1, stringOrders)
@@ -92,19 +111,26 @@ class HomeActivity : AppCompatActivity() {
 
 
     @RequiresApi(Build.VERSION_CODES.M)
-    @SuppressLint("ResourceAsColor", "CutPasteId", "UseSwitchCompatOrMaterialCode")
+    @SuppressLint("ResourceAsColor", "CutPasteId", "UseSwitchCompatOrMaterialCode",
+        "MissingInflatedId"
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         //var switch = toolbar.getChildAt(0) as Switch
         val switch = findViewById<Switch>(R.id.switchView)
-        switch.text = "Нет интернета"
+        if(!MainActivity.connectionFlag){
+            switch.text = "Нет интернета"
+        }
+
 
         val token:String = GetSettings(this).load("token")
 
         Thread(Runnable {
             Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),false)
+            Log.d("courier_log", "запросил статус")
         }).start()
 
         switch.setOnCheckedChangeListener { _, _ ->
@@ -119,20 +145,24 @@ class HomeActivity : AppCompatActivity() {
 
         _context = this
 
-        if (stringOrders.isEmpty()) {
 
+        textViewNoOrders = findViewById(R.id.no_orders)
+        ll = findViewById(R.id.recyclerView)
+        progressBar = findViewById(R.id.progressBarHomeActivity)
+
+        if (stringOrders.isNotEmpty()) {
+        progressBar.visibility = View.GONE
         }
-        ll = findViewById<ListView>(R.id.recyclerView)
+        var countOrders = orders?.size
+        Log.d("courier_log", "первый запуск адаптера(HomeActivity), в массеве $countOrders элементов")
         ll.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)
 
         ll.setOnItemClickListener { _, _, position, _ ->
 
             val jsonOrder:String = gson.toJson(orders?.get(position))
-
             val intent = Intent(this, DetailsActivity::class.java)
             intent.putExtra("order", jsonOrder)
             startActivity(intent)
-            Toast.makeText(this,  jsonOrder, Toast.LENGTH_SHORT).show()
         }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)

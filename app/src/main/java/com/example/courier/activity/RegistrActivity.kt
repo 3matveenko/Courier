@@ -50,7 +50,7 @@ class RegistrActivity : AppCompatActivity() {
                     child.visibility = View.GONE
 
             }
-                findViewById<ProgressBar>(R.id.progressBar).visibility = View.VISIBLE
+                findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility = View.VISIBLE
 
                 Http(this@RegistrActivity).registr(CreateDriver(login, password, name))
             }
