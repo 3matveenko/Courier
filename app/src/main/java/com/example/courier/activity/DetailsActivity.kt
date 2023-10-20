@@ -38,7 +38,7 @@ class DetailsActivity : AppCompatActivity() {
         var time = findViewById<TextView>(R.id.time_text)
         val rejectButton = findViewById<Button>(R.id.reject_in_details)
         val sendSmsButton = findViewById<Button>(R.id.send_sms)
-        val backButton = findViewById<Button>(R.id.back_from_details)
+        val backButton = findViewById<Button>(R.id.back)
         var editCode = findViewById<EditText>(R.id.editCode)
         val checkedButton = findViewById<Button>(R.id.checkButton)
 

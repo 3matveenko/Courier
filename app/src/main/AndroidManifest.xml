@@ -29,19 +29,22 @@
         android:theme="@style/Theme.Courier"
         tools:targetApi="31">
         <activity
-            android:screenOrientation="portrait"
-            android:name=".activity.DetailsActivity"
+            android:name=".activity.SettingActivity"
             android:exported="false" />
         <activity
-            android:screenOrientation="portrait"
+            android:name=".activity.DetailsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activity.NewOrderActivity"
             android:exported="false"
             android:label="@string/title_activity_new_order"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Courier" />
         <activity
-            android:screenOrientation="portrait"
             android:name=".activity.HomeActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.RegistrActivity"
             android:exported="false"

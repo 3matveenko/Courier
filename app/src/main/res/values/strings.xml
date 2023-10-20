@@ -26,4 +26,6 @@
     <string name="code">код</string>
     <string name="check">проверить</string>
     <string name="no_orders">нет назначенных заказов</string>
+    <string name="scanner_settings">Сканировать настройки</string>
+    <string name="logout">Сменить аккаунт</string>
 </resources>

@@ -15,6 +15,18 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints">
 
+        <ImageButton
+            android:layout_gravity="start"
+            android:background="@color/base_color"
+            android:id="@+id/go_to_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@android:drawable/ic_dialog_dialer" />
+
         <Switch
             android:id="@+id/switchView"
             android:layout_width="wrap_content"
@@ -63,5 +75,7 @@
 
 
     </ListView>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

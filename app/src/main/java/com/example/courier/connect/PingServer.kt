@@ -11,7 +11,7 @@ import java.net.Socket
 class PingServer(private var context: Context) {
 
     fun connection() {
-        Log.d("courier_log", "PingServer starting")
+        Log.d("courier_log", "PingServer запустил пинг")
         while (true){
             val backServer: String = GetSettings(context).load(GetSettings.SERVER_NAME)
             val backServerPort: String = GetSettings(context).load(GetSettings.SERVER_PORT)

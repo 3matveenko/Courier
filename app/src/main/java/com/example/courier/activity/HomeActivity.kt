@@ -11,6 +11,8 @@ import android.os.Process
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.Switch
@@ -115,12 +117,18 @@ class HomeActivity : AppCompatActivity() {
         "MissingInflatedId"
     )
     override fun onCreate(savedInstanceState: Bundle?) {
-
+        Log.d("courier_log", "(HomeActivity)  onCreate")
+        Rabbit(applicationContext).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        //var switch = toolbar.getChildAt(0) as Switch
         val switch = findViewById<Switch>(R.id.switchView)
+        val goToSetting = findViewById<ImageButton>(R.id.go_to_settings)
+        goToSetting.setOnClickListener {
+            val intent = Intent(this, SettingActivity::class.java)
+            startActivity(intent)
+        }
+
         if(!MainActivity.connectionFlag){
             switch.text = "Нет интернета"
         }
@@ -154,7 +162,7 @@ class HomeActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
         }
         var countOrders = orders?.size
-        Log.d("courier_log", "первый запуск адаптера(HomeActivity), в массеве $countOrders элементов")
+
         ll.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)
 
         ll.setOnItemClickListener { _, _, position, _ ->

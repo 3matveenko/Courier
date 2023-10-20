@@ -47,13 +47,14 @@ class Rabbit(private var context: Context) {
     }
 
     fun startListening() {
-        Log.d("courier_log", "startListening()")
+        Log.d("courier_log", "Rabbit startListening()")
         if (connection != null) {
             return
         }
         Thread(Runnable {
             do {
                 var flag = false
+                Log.e("courier_log", "Rabbit connectionFlag =  $connectionFlag")
                 if(connectionFlag){
                     Log.d("courier_log", "Rabbit startListening ok")
                     createConnectionAndChannel()
@@ -86,7 +87,7 @@ class Rabbit(private var context: Context) {
                     channel!!.basicConsume(queueName, true, consumer)
                 } else {
                     Log.e("courier_log", "Rabbit startListening disconnect")
-                    Thread.sleep(5000)
+                    Thread.sleep(1000)
                     flag = true
                 }
             } while (flag)
@@ -119,7 +120,7 @@ class Rabbit(private var context: Context) {
                     Log.d("courier_log", "Rabbit sendMessage ok")
                 } else {
                     Log.e("courier_log", "Rabbit sendMessage disconnect")
-                    Thread.sleep(5000)
+                    Thread.sleep(1000)
                     flag = true
                 }
             } while (flag)

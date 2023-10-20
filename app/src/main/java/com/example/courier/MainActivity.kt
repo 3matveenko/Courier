@@ -25,6 +25,7 @@ import com.example.courier.connect.PingServer
 import com.example.courier.connect.Rabbit
 import com.example.courier.connect.SendLocation
 import com.example.courier.models.GetSettings
+import com.example.courier.models.GetSettings.Companion.SERVER_NAME
 import com.example.courier.models.GetSettings.Companion.TOKEN
 import com.example.courier.models.LoginDriver
 import com.example.courier.models.Setting
@@ -42,10 +43,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
+        Log.d("courier_log", "MainActivity ***START app Courier***")
         Thread(Runnable {
+            Log.d("courier_log", "(MainActivity Перехожу в PingServer")
             PingServer(this).connection()
         }).start()
-        Log.d("courier_log", "***START app Courier***")
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Toast.makeText(this, "Дайте разрешение выводить приложение поверх других окон!", Toast.LENGTH_LONG).show()
             val intent = Intent(
@@ -58,55 +61,49 @@ class MainActivity : AppCompatActivity() {
         broadcastIni()
 
         var token = GetSettings(this).load(TOKEN)
-        Log.d("courier_log", "token = $token")
-        if (token != ""){
-            Rabbit(applicationContext).sendMessage(token,"get_my_orders_status_progressing","")
+        Log.d("courier_log", "MainActivity token = $token")
+        if (!GetSettings(this).isNull(TOKEN)){
             Rabbit(applicationContext).startListening()
             Thread(Runnable {
                 SendLocation(this).request()
             }).start()
             startActivity(Intent(this@MainActivity, HomeActivity::class.java))
         } else {
-            Log.e("courier_log", "token не обнаружен")
-            startQr()
+            Log.e("courier_log", "MainActivity token не обнаружен")
+            //startQr()
         }
 
         findViewById<Button>(R.id.but_registr).setOnClickListener {
+            Log.d("courier_log", "(MainActivity Перехожу в RegistrActivity")
             startActivity(Intent(this@MainActivity, RegistrActivity::class.java))
         }
-
-        findViewById<Button>(R.id.but_registr).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.base_color))
-        findViewById<Button>(R.id.but_enter).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.base_color))
-        findViewById<Button>(R.id.but_qr).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.base_color))
 
         findViewById<Button>(R.id.but_qr).setOnClickListener {
             startQr()
         }
 
         findViewById<Button>(R.id.but_enter).setOnClickListener {
-            val login = findViewById<EditText>(R.id.editEmail).text.toString()
-            val password = findViewById<EditText>(R.id.editPassword).text.toString()
-            if(login.isEmpty()||password.isEmpty()){
-                Toast.makeText(this, "Поле должно быть заполнено", Toast.LENGTH_SHORT).show()
-            } else {
-                val rootLayout = findViewById<ConstraintLayout>(R.id.loginLayout)
-                val childCount = rootLayout.childCount
-                for (i in 0 until childCount) {
-                    val child = rootLayout.getChildAt(i)
-                    child.visibility = View.GONE
-                }
+            if (!GetSettings(this).isNull(SERVER_NAME)) {
+                val login = findViewById<EditText>(R.id.editEmail).text.toString()
+                val password = findViewById<EditText>(R.id.editPassword).text.toString()
+                if (login.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(this, "Поле должно быть заполнено", Toast.LENGTH_SHORT).show()
+                } else {
+                    val rootLayout = findViewById<ConstraintLayout>(R.id.loginLayout)
+                    val childCount = rootLayout.childCount
+                    for (i in 0 until childCount) {
+                        val child = rootLayout.getChildAt(i)
+                        child.visibility = View.GONE
+                    }
 
-                findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility = View.VISIBLE
-                Http(this ).login(LoginDriver(login, password))
+                    findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility =
+                        View.VISIBLE
+                    Http(this).login(LoginDriver(login, password))
+                }
+            } else {
+                Toast.makeText(this, "отсканируйте QR код у администратора!",Toast.LENGTH_SHORT).show()
             }
         }
-
-        if (GetSettings(applicationContext).isNull(GetSettings.SERVER_NAME)) {
-            Toast.makeText(this, GetSettings(applicationContext).load(GetSettings.SERVER_NAME),Toast.LENGTH_LONG).show()
-            startQr()
-        }
-
-
     }
 
     fun broadcastIni(){
@@ -138,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         if (result != null) {
             if (result.contents == null) {
                 Toast.makeText(this, "Сканирование отменено", Toast.LENGTH_SHORT).show()
-                finish()
+                //finish()
             } else {
                 try {
                     val gson = Gson()

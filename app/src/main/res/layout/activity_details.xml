@@ -6,6 +6,27 @@
     android:layout_height="match_parent"
     tools:context=".activity.DetailsActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/base_color"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints">
+
+        <Button
+            android:layout_gravity="end"
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/base_color"
+            android:text="@string/back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.appcompat.widget.Toolbar>
+
     <View
         android:id="@+id/lineView6"
         android:layout_width="match_parent"
@@ -158,7 +179,7 @@
         android:text="@string/add_time_title"
         android:textColor="?attr/detailsTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <TextView
         android:id="@+id/time_text"
@@ -215,35 +236,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/address_text" />
 
-    <Button
-        android:id="@+id/back_from_details"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginBottom="25dp"
-        android:text="@string/back"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:backgroundTint="@color/base_color"/>
 
     <EditText
         android:id="@+id/editCode"
         android:layout_width="120dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="-90dp"
+        android:layout_marginBottom="-80dp"
         android:ems="10"
         android:hint="@string/code"
         android:inputType="text"
         app:layout_constraintBottom_toBottomOf="@+id/reject_in_details"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/checkButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="-90dp"
+        android:layout_marginBottom="-80dp"
         android:backgroundTint="@color/base_color"
         android:text="@string/check"
         app:layout_constraintBottom_toBottomOf="@+id/send_sms"

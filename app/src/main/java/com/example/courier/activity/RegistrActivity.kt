@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import com.example.courier.R
 import com.example.courier.models.CreateDriver
 import com.example.courier.models.GetSettings
@@ -28,10 +27,6 @@ class RegistrActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registr)
-        findViewById<Button>(R.id.but_enter).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.base_color))
-
-
-
 
         findViewById<Button>(R.id.but_enter).setOnClickListener {
             val login = findViewById<EditText>(R.id.editEmail).text.toString()
@@ -55,6 +50,10 @@ class RegistrActivity : AppCompatActivity() {
                 Http(this@RegistrActivity).registr(CreateDriver(login, password, name))
             }
 
+        }
+
+        findViewById<Button>(R.id.back).setOnClickListener {
+            finish()
         }
     }
 
