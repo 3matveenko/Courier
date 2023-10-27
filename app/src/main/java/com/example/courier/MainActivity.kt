@@ -15,7 +15,6 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.activity.HomeActivity
 import com.example.courier.activity.RegistrActivity
@@ -83,26 +82,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.but_enter).setOnClickListener {
-            if (!GetSettings(this).isNull(SERVER_NAME)) {
-                val login = findViewById<EditText>(R.id.editEmail).text.toString()
-                val password = findViewById<EditText>(R.id.editPassword).text.toString()
-                if (login.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(this, "Поле должно быть заполнено", Toast.LENGTH_SHORT).show()
-                } else {
-                    val rootLayout = findViewById<ConstraintLayout>(R.id.loginLayout)
-                    val childCount = rootLayout.childCount
-                    for (i in 0 until childCount) {
-                        val child = rootLayout.getChildAt(i)
-                        child.visibility = View.GONE
-                    }
+            if(connectionFlag){
+                if (!GetSettings(this).isNull(SERVER_NAME)) {
+                    val login = findViewById<EditText>(R.id.editEmail).text.toString()
+                    val password = findViewById<EditText>(R.id.editPassword).text.toString()
+                    if (login.isEmpty() || password.isEmpty()) {
+                        Toast.makeText(this, "Поле должно быть заполнено", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val rootLayout = findViewById<ConstraintLayout>(R.id.loginLayout)
+                        val childCount = rootLayout.childCount
+                        for (i in 0 until childCount) {
+                            val child = rootLayout.getChildAt(i)
+                            child.visibility = View.GONE
+                        }
 
-                    findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility =
-                        View.VISIBLE
-                    Http(this).login(LoginDriver(login, password))
+                        findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility =
+                            View.VISIBLE
+                        Http(this).login(LoginDriver(login, password))
+                    }
+                } else {
+                    Toast.makeText(this, "отсканируйте QR код у администратора!",Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "отсканируйте QR код у администратора!",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "нет интернета!",Toast.LENGTH_SHORT).show()
             }
+
         }
     }
 
@@ -152,7 +156,7 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this, "QR-код отсканирован", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e : Exception){
-                    Log.e("courier_log", "QR-код не распознан")
+                    Log.e("courier_log", "QR-код не распознан $e")
                     Toast.makeText(this, "QR-код не распознан", Toast.LENGTH_SHORT).show()
                 }
 

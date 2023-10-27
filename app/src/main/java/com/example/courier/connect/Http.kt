@@ -30,6 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Modifier
 import java.util.Date
 
+@SuppressLint("SuspiciousIndentation")
 class Http(private var activity: AppCompatActivity) {
     private lateinit var api: API
 
@@ -48,7 +49,7 @@ class Http(private var activity: AppCompatActivity) {
             var flag = false
             if (MainActivity.connectionFlag) {
                 val server: String =
-                    GetSettings(activity).load(GetSettings.PROTOCOL) +
+                    GetSettings(activity).load(GetSettings.PROTOCOL) + "://"+
                             GetSettings(activity).load(GetSettings.SERVER_NAME) + ":" +
                             GetSettings(activity).load(GetSettings.SERVER_PORT)
                 Log.e("courier_log", "retrofit init $server")
@@ -105,8 +106,8 @@ class Http(private var activity: AppCompatActivity) {
             @SuppressLint("CutPasteId", "SetTextI18n", "SimpleDateFormat")
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
-                    val intent = Intent(activity, HomeActivity::class.java)
                     GetSettings(activity).save(TOKEN, response.body().toString())
+                    val intent = Intent(activity, HomeActivity::class.java)
                     activity.startActivity(intent)
                 }
                 if (response.code() == 403) {

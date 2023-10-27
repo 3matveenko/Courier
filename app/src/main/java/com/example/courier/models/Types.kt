@@ -34,25 +34,25 @@ data class Setting(
     @SerializedName(value = "protocol")
     val protocol:String,
 
-    @SerializedName(value = "server_name")
+    @SerializedName(value = "serverName")
     val serverName:String,
 
-    @SerializedName(value = "server_port")
+    @SerializedName(value = "serverPort")
     val serverPort : String,
 
-    @SerializedName(value = "back_queue_name")
+    @SerializedName(value = "backQueueName")
     val backQueueName : String,
 
-    @SerializedName(value = "rabbit_server_name")
+    @SerializedName(value = "rabbitServerName")
     val rabbitServerName:String,
 
-    @SerializedName(value = "rabbit_server_port")
+    @SerializedName(value = "rabbitServerPort")
      val rabbitServerPort : String,
 
-    @SerializedName(value = "rabbit_username")
+    @SerializedName(value = "rabbitUsername")
      val rabbitUsername : String,
 
-    @SerializedName(value = "rabbit_password")
+    @SerializedName(value = "rabbitPassword")
      val rabbitPassword : String,
 )
 
@@ -124,4 +124,13 @@ data class SendSms(
 
     @SerializedName(value = "code")
     val code: String,
+)
+
+data class Reject(
+
+    @SerializedName(value = "order_id")
+    val order_id: Long,
+
+    @SerializedName(value = "comment")
+    val comment: String,
 )
