@@ -126,11 +126,3 @@ data class SendSms(
     val code: String,
 )
 
-data class Reject(
-
-    @SerializedName(value = "order_id")
-    val order_id: Long,
-
-    @SerializedName(value = "comment")
-    val comment: String,
-)

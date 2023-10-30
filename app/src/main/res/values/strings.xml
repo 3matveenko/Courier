@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Courier</string>
+    <string name="send">Отправить</string>
+    <string name="close">Закрыть</string>
     <string name="entrance">Вход</string>
     <string name="description_title">Для продолжения вам необходимо войти в свою учетную запись</string>
     <string name="login">Логин</string>
@@ -28,4 +30,6 @@
     <string name="no_orders">нет назначенных заказов</string>
     <string name="scanner_settings">Сканировать настройки</string>
     <string name="logout">Сменить аккаунт</string>
+    <string name="rejaction_reason">Назовите причину отказа</string>
+    <string name="Textview_reject_order">Отказ от всех не доставленных заказов.</string>
 </resources>

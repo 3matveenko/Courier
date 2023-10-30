@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -22,7 +21,6 @@ import com.example.courier.models.SendSms
 import com.google.gson.GsonBuilder
 import java.lang.reflect.Modifier
 import java.text.SimpleDateFormat
-import com.example.courier.activity.HomeActivity.Companion.orders
 
 class DetailsActivity : AppCompatActivity() {
 
@@ -66,6 +64,31 @@ class DetailsActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             finish()
         }
+        rejectButton.setOnClickListener {
+            if(MainActivity.connectionFlag){
+                val dialogView = layoutInflater.inflate(R.layout.reject_order_alert, null)
+                val dialog = AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .create()
+
+                dialogView.findViewById<Button>(R.id.button_close_alert_reject_order).setOnClickListener {
+                    dialog.dismiss()
+                }
+                dialogView.findViewById<Button>(R.id.button_send_comment_reject_order).setOnClickListener {
+                    val comment = dialogView.findViewById<EditText>(R.id.commentRejectEditText)
+                    if(comment.text.toString() != ""){
+                        Rabbit(this).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"reject_order",comment.text.toString())
+                        dialog.dismiss()
+                        finish()
+                    } else {
+                        Toast.makeText(this, "Добавьте причину отказа!",Toast.LENGTH_LONG).show()
+                    }
+                }
+                dialog.show()
+            } else {
+                Toast.makeText(this,"Нет интернета!",Toast.LENGTH_SHORT).show()
+            }
+        }
         sendSmsButton.setOnClickListener {
             if(MainActivity.connectionFlag){
             val dialogView = layoutInflater.inflate(R.layout.send_sms_alert, null)
@@ -105,9 +128,6 @@ class DetailsActivity : AppCompatActivity() {
                     Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
                     var token = GetSettings(this).load(GetSettings.TOKEN)
                     Rabbit(this).sendMessage(token,"order_success",order.id.toString())
-                    orders?.toMutableList()?.remove(order)
-                    val intent = Intent(this, HomeActivity::class.java)
-                    startActivity(intent)
                     finish()
                 } else {
                     Toast.makeText(this,"Код введен не верно!",Toast.LENGTH_LONG).show()

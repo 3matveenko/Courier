@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="500dp"
+android:orientation="vertical">
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_weight="1"
+        android:text="@string/Textview_reject_order"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:gravity="center_vertical"
+        tools:ignore="RtlCompat" />
+
+<EditText
+    android:id="@+id/commentRejectEditText"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:hint="@string/rejaction_reason"
+    android:inputType="textMultiLine"
+    android:gravity="top"
+    android:layout_gravity="top|start"
+    android:minLines="3"
+    android:maxLines="10"
+    android:scrollbars="vertical" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="10"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/button_close_alert_reject_order"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/close"
+        android:backgroundTint="@color/base_color"/>
+
+    <Button
+        android:id="@+id/button_send_comment_reject_order"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/send"
+        android:backgroundTint="@color/base_color"/>
+</LinearLayout>
+</LinearLayout>
