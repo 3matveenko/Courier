@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.util.Log
+import android.widget.Button
 import android.widget.Switch
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -162,19 +163,19 @@ class Http(private var activity: AppCompatActivity) {
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     @RequiresApi(Build.VERSION_CODES.M)
     fun drawSwitch(boolean: Boolean){
-        val switch = (activity as Activity).findViewById<Switch>(R.id.switchView)
+        val switch = (activity as Activity).findViewById<Button>(R.id.switchView)
         val colorGreen = ContextCompat.getColor(activity, R.color.green)
         val colorRed = ContextCompat.getColor(activity, R.color.red)
         if(boolean){
             switch.text = "Свободен"
             switch.setTextColor(colorGreen)
-            val thumbColor = ColorStateList.valueOf(colorGreen)
-            switch.thumbTintList = thumbColor
+//            val thumbColor = ColorStateList.valueOf(colorGreen)
+//            switch.setBackgroundColor(thumbColor)
         } else {
             switch.text = "Занят"
             switch.setTextColor(colorRed)
-            val thumbColor = ColorStateList.valueOf(colorRed)
-            switch.thumbTintList = thumbColor
+//            val thumbColor = ColorStateList.valueOf(colorRed)
+//            switch.thumbTintList = thumbColor
         }
     }
 }

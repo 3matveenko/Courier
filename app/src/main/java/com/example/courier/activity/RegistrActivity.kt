@@ -49,7 +49,6 @@ class RegistrActivity : AppCompatActivity() {
 
                 Http(this@RegistrActivity).registr(CreateDriver(login, password, name))
             }
-
         }
 
         findViewById<Button>(R.id.back).setOnClickListener {

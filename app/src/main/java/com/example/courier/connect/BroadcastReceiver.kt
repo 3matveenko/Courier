@@ -18,6 +18,10 @@ class MyBroadcastReceiver: BroadcastReceiver() {
             if (intent?.action == "open_new_order") {
                 val newOrderIntent = Intent(context, NewOrderActivity::class.java)
                 val message = intent.getStringExtra("body")
+                val reject = intent.getStringExtra("reject")
+                if(reject=="true"){
+                    newOrderIntent.putExtra("reject", "true")
+                }
                 newOrderIntent.putExtra("body", message)
                 newOrderIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(newOrderIntent)

@@ -18,6 +18,7 @@ class SettingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_setting)
 
         findViewById<Button>(R.id.back).setOnClickListener {
+            startActivity(Intent(this@SettingActivity, HomeActivity::class.java))
             finish()
         }
         findViewById<TextView>(R.id.scanner_setting).setOnClickListener{
@@ -27,6 +28,7 @@ class SettingActivity : AppCompatActivity() {
             integrator.initiateScan()
         }
         findViewById<TextView>(R.id.logout).setOnClickListener{
+            //смена статуса при выходе
             GetSettings(this).remove("token")
             startActivity(Intent(this,MainActivity::class.java))
         }

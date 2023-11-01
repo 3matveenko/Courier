@@ -13,6 +13,7 @@
     <string name="enter">Ввод</string>
     <string name="qr">QR</string>
     <string name="title_activity_new_order">вам поступил новый заказ</string>
+    <string name="rejected_text_in_new_order">от другого водителя</string>
     <string name="accept">Принять</string>
     <string name="reject">Отклонить</string>
     <string name="address_delivery">Адрес доставки</string>

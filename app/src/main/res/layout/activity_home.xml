@@ -27,14 +27,15 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/ic_dialog_dialer" />
 
-        <Switch
+        <Button
             android:id="@+id/switchView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:clickable="true"
+            android:clickable="false"
             android:focusable="true"
-            android:paddingEnd="16dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/grayL"
             android:textSize="20sp"
             tools:ignore="InvalidId"
             tools:layout_editor_absoluteX="349dp"

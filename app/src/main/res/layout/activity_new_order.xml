@@ -18,6 +18,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/rejectedTextInNewOrder"
+        android:layout_width="306dp"
+        android:layout_height="99dp"
+        android:layout_marginTop="200dp"
+        android:text="@string/rejected_text_in_new_order"
+        android:textAlignment="center"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/accept"
         android:layout_width="match_parent"

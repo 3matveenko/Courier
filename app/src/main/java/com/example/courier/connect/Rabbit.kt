@@ -70,6 +70,15 @@ class Rabbit(private var context: Context) {
                             val message = gson.fromJson(stringMessage, Message::class.java)
 
                             when(message.code){
+                                "new_order_rejected" ->
+                                    if((message.millisecondsSinceEpoch+29000)>=System.currentTimeMillis()){
+                                        val intent = Intent("open_new_order")
+                                        intent.putExtra("reject","true")
+                                        intent.putExtra("body",message.body)
+                                        LocalBroadcastManager
+                                            .getInstance(context)
+                                            .sendBroadcast(intent)
+                                    }
                                 "new_order" ->
                                     if((message.millisecondsSinceEpoch+29000)>=System.currentTimeMillis()){
                                         LocalBroadcastManager

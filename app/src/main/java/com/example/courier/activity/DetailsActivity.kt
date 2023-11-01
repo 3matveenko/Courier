@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -24,21 +25,22 @@ import java.text.SimpleDateFormat
 
 class DetailsActivity : AppCompatActivity() {
 
-    @SuppressLint("MissingInflatedId", "SimpleDateFormat")
+    @SuppressLint("MissingInflatedId", "SimpleDateFormat", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
 
-        var ordesNrmber = findViewById<TextView>(R.id.orders_number_text)
-        var currentName = findViewById<TextView>(R.id.current_text)
-        var phoneNumber = findViewById<TextView>(R.id.phone_number_text)
-        var address = findViewById<TextView>(R.id.address_text)
-        var time = findViewById<TextView>(R.id.time_text)
+        val ordersNumber = findViewById<TextView>(R.id.orders_number_text)
+        val currentName = findViewById<TextView>(R.id.current_text)
+        val phoneNumber = findViewById<TextView>(R.id.phone_number_text)
+        val address = findViewById<TextView>(R.id.address_text)
+        val time = findViewById<TextView>(R.id.time_text)
         val rejectButton = findViewById<Button>(R.id.reject_in_details)
         val sendSmsButton = findViewById<Button>(R.id.send_sms)
         val backButton = findViewById<Button>(R.id.back)
         var editCode = findViewById<EditText>(R.id.editCode)
         val checkedButton = findViewById<Button>(R.id.checkButton)
+        val rejectedTextView = findViewById<TextView>(R.id.rejectedView)
 
         val orderString:String = intent.getStringExtra("order").toString()
         val gson = GsonBuilder()
@@ -49,8 +51,13 @@ class DetailsActivity : AppCompatActivity() {
                 Modifier.VOLATILE
             )
             .create()
-        var order: Order = gson.fromJson(orderString,Order::class.java)
-        ordesNrmber.text = order.guid
+        val order: Order = gson.fromJson(orderString,Order::class.java)
+        if(order.rejectOrder!=null){
+            rejectedTextView.text = "Заказ перенаправлен от "+order.rejectOrder.driver.name
+        } else {
+            rejectedTextView.visibility = View.GONE
+        }
+        ordersNumber.text = order.guid
         currentName.text = order.current
         phoneNumber.text = order.phone
         address.text = order.address
@@ -62,6 +69,7 @@ class DetailsActivity : AppCompatActivity() {
         }
 
         backButton.setOnClickListener {
+            startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
             finish()
         }
         rejectButton.setOnClickListener {
@@ -79,6 +87,7 @@ class DetailsActivity : AppCompatActivity() {
                     if(comment.text.toString() != ""){
                         Rabbit(this).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"reject_order",comment.text.toString())
                         dialog.dismiss()
+                        startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
                         finish()
                     } else {
                         Toast.makeText(this, "Добавьте причину отказа!",Toast.LENGTH_LONG).show()
@@ -101,7 +110,7 @@ class DetailsActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             dialogView.findViewById<Button>(R.id.alert_sms_yes).setOnClickListener {
-                var randomNumber:String
+                val randomNumber:String
                 if(GetSettings(this).isNull("id_"+order.id)){
                     val random = java.util.Random()
                     randomNumber = String.format("%04d", random.nextInt(10000))
@@ -126,8 +135,9 @@ class DetailsActivity : AppCompatActivity() {
                 if(GetSettings(this).load("id_"+order.id)==editCode.text.toString()){
                     GetSettings(this).remove("id_"+order.id)
                     Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
-                    var token = GetSettings(this).load(GetSettings.TOKEN)
+                    val token = GetSettings(this).load(GetSettings.TOKEN)
                     Rabbit(this).sendMessage(token,"order_success",order.id.toString())
+                    startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
                     finish()
                 } else {
                     Toast.makeText(this,"Код введен не верно!",Toast.LENGTH_LONG).show()

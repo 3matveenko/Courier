@@ -115,6 +115,19 @@ data class Order(
 
     @SerializedName(value = "longitude")
     val longitude:Double,
+
+    @SerializedName(value = "rejectOrder")
+    val rejectOrder:RejectOrder
+)
+
+data class RejectOrder(
+    @SerializedName(value = "driver")
+    val driver:Driver
+)
+
+data class Driver(
+    @SerializedName(value = "login")
+    val name:String
 )
 
 data class SendSms(

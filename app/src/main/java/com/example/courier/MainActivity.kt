@@ -43,10 +43,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
         Log.d("courier_log", "MainActivity ***START app Courier***")
-        Thread(Runnable {
-            Log.d("courier_log", "(MainActivity Перехожу в PingServer")
-            PingServer(this).connection()
-        }).start()
+        if (!GetSettings(this).isNull(SERVER_NAME)) {
+            Thread(Runnable {
+                Log.d("courier_log", "(MainActivity Перехожу в PingServer")
+                PingServer(this).connection()
+            }).start()
+        } else {
+            Log.e("courier_log", "MainActivity SERVER_NAME не обнаружен")
+            startQr()
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Toast.makeText(this, "Дайте разрешение выводить приложение поверх других окон!", Toast.LENGTH_LONG).show()
@@ -67,9 +72,6 @@ class MainActivity : AppCompatActivity() {
                 SendLocation(this).request()
             }).start()
             startActivity(Intent(this@MainActivity, HomeActivity::class.java))
-        } else {
-            Log.e("courier_log", "MainActivity token не обнаружен")
-            //startQr()
         }
 
         findViewById<Button>(R.id.but_registr).setOnClickListener {

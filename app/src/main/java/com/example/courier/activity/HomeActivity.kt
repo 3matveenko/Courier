@@ -47,6 +47,7 @@ class HomeActivity : AppCompatActivity() {
         @SuppressLint("StaticFieldLeak")
         lateinit var textViewNoOrders:TextView
 
+        @SuppressLint("StaticFieldLeak")
         lateinit var progressBar:ProgressBar
 
         @SuppressLint("StaticFieldLeak")
@@ -92,7 +93,12 @@ class HomeActivity : AppCompatActivity() {
                     progressBar.visibility = View.GONE
                     orders?.forEach {
                         if (it != null) {
-                            stringOrders.add(it.address)
+                            if(it.rejectOrder==null){
+                                stringOrders.add(it.address)
+                            } else {
+                                stringOrders.add(it.address+" Перенаправленный заказ!")
+                            }
+
                         }
                     }
                 } else{
@@ -100,7 +106,7 @@ class HomeActivity : AppCompatActivity() {
                     textViewNoOrders.visibility = View.VISIBLE
                     progressBar.visibility = View.GONE
                 }
-                var countOrders = orders?.size
+                val countOrders = orders?.size
                 Log.d("courier_log", "перезаписал адаптер(HomeActivity), в массеве $countOrders элементов")
                 if (::ll.isInitialized) {
                     ll.adapter =
@@ -122,7 +128,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        val switch = findViewById<Switch>(R.id.switchView)
+        val switch = findViewById<Button>(R.id.switchView)
         val goToSetting = findViewById<ImageButton>(R.id.go_to_settings)
         goToSetting.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)
@@ -141,7 +147,7 @@ class HomeActivity : AppCompatActivity() {
             Log.d("courier_log", "запросил статус")
         }).start()
 
-        switch.setOnCheckedChangeListener { _, _ ->
+        switch.setOnClickListener {
             Log.e("courier_log",Thread.activeCount().toString())
             Thread(Runnable {
             Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),true)

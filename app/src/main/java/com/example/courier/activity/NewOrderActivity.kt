@@ -10,10 +10,12 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.view.View
 import android.view.WindowManager
 import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -55,7 +57,10 @@ class NewOrderActivity : AppCompatActivity() {
         findViewById<Button>(R.id.reject).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.red))
         findViewById<Button>(R.id.accept).setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.green))
 
-
+        val reject = intent.getStringExtra("reject")
+        if(reject == null){
+            findViewById<TextView>(R.id.rejectedTextInNewOrder).visibility = View.GONE
+        }
 
 
         findViewById<Button>(R.id.accept).setOnClickListener{
@@ -66,9 +71,14 @@ class NewOrderActivity : AppCompatActivity() {
             LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentMESSAGE)
 
             val token = GetSettings(this).load("token").toString()
-            Rabbit(this).sendMessage(token,"accept_order","ok")
+            if(reject == null){
+                Rabbit(this).sendMessage(token,"accept_order","ok")
+            } else {
+                Rabbit(this).sendMessage(token,"accept_rejected_order","ok")
+            }
             vibrator.cancel()
             mediaPlayer.release()
+            startActivity(Intent(this@NewOrderActivity, HomeActivity::class.java))
             finish()
         }
 
@@ -89,6 +99,7 @@ class NewOrderActivity : AppCompatActivity() {
         findViewById<Button>(R.id.reject).setOnClickListener{
             vibrator.cancel()
             mediaPlayer.release()
+            startActivity(Intent(this@NewOrderActivity, HomeActivity::class.java))
             finish()
         }
     }
