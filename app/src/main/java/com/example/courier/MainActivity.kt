@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         if (!GetSettings(this).isNull(TOKEN)){
             Rabbit(applicationContext).startListening()
             Thread(Runnable {
-                SendLocation(this).request()
+                SendLocation(this).requestLocation(this)
             }).start()
             startActivity(Intent(this@MainActivity, HomeActivity::class.java))
         }

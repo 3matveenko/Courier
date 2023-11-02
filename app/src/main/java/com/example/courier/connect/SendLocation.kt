@@ -47,7 +47,7 @@ class SendLocation(context: Context) : LocationListener {
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
-    fun checkLocationStatus(context: Context) {
+    private fun checkLocationStatus(context: Context) {
         if (!isLocationEnabled(context)) {
             requestLocationEnabled(context)
         }
@@ -75,7 +75,7 @@ class SendLocation(context: Context) : LocationListener {
                         val location = locationResult.lastLocation
                         val latitude = location.latitude
                         val longitude = location.longitude
-                        Toast.makeText(context.applicationContext, "Широта: $latitude, Долгота: $longitude", Toast.LENGTH_LONG).show()
+                        //Toast.makeText(context.applicationContext, "Широта: $latitude, Долгота: $longitude", Toast.LENGTH_LONG).show()
 
                         val gson = Gson()
                         val body = gson.toJson(LocationMy(latitude, longitude))
