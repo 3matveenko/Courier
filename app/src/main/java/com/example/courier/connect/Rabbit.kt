@@ -20,7 +20,7 @@ import java.util.concurrent.Executors
 
 class Rabbit(private var context: Context) {
     companion object {
-        private var connection: Connection? = null
+        var connection: Connection? = null
         private var channel: Channel? = null
     }
 
@@ -47,7 +47,7 @@ class Rabbit(private var context: Context) {
     }
 
     fun startListening() {
-        Log.d("courier_log", "Rabbit startListening()")
+        Log.d("courier_log", "Rabbit зашел в метод startListening")
         if (connection != null) {
             return
         }
@@ -56,7 +56,7 @@ class Rabbit(private var context: Context) {
                 var flag = false
                 Log.e("courier_log", "Rabbit connectionFlag =  $connectionFlag")
                 if(connectionFlag){
-                    Log.d("courier_log", "Rabbit startListening ok")
+                    Log.d("courier_log", "Rabbit startListening успешно запустился")
                     createConnectionAndChannel()
                     val consumer = object : DefaultConsumer(channel) {
                         override fun handleDelivery(
@@ -68,8 +68,12 @@ class Rabbit(private var context: Context) {
                             val stringMessage = String(body!!, Charsets.UTF_8)
                             val gson = Gson()
                             val message = gson.fromJson(stringMessage, Message::class.java)
-
-                            when(message.code){
+                            val code = message.code
+                            val body = message.body
+                            val timeNow = System.currentTimeMillis()
+                            val timeMessage = message.millisecondsSinceEpoch
+                            Log.d("courier_log", "Rabbit получил сообщение в $timeNow время в сообщении $timeMessage с кодом $code и содержанием $body")
+                            when(code){
                                 "new_order_rejected" ->
                                     if((message.millisecondsSinceEpoch+29000)>=System.currentTimeMillis()){
                                         val intent = Intent("open_new_order")

@@ -53,7 +53,7 @@ class DetailsActivity : AppCompatActivity() {
             .create()
         val order: Order = gson.fromJson(orderString,Order::class.java)
         if(order.rejectOrder!=null){
-            rejectedTextView.text = "Заказ перенаправлен от "+order.rejectOrder.driver.name
+            rejectedTextView.text = "Заказ от "+order.rejectOrder.driver.name
         } else {
             rejectedTextView.visibility = View.GONE
         }

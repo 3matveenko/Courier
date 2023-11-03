@@ -8,6 +8,8 @@ import android.widget.Button
 import android.widget.TextView
 import com.example.courier.MainActivity
 import com.example.courier.R
+import com.example.courier.connect.Rabbit
+import com.example.courier.connect.Rabbit.Companion.connection
 import com.example.courier.models.GetSettings
 import com.google.zxing.integration.android.IntentIntegrator
 
@@ -28,8 +30,10 @@ class SettingActivity : AppCompatActivity() {
             integrator.initiateScan()
         }
         findViewById<TextView>(R.id.logout).setOnClickListener{
-            //смена статуса при выходе
+            val token = GetSettings(this).load("token")
+            Rabbit(this).sendMessage(token,"logout","ok")
             GetSettings(this).remove("token")
+            connection = null;
             startActivity(Intent(this,MainActivity::class.java))
         }
     }

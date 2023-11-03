@@ -78,8 +78,21 @@ class Http(private var activity: AppCompatActivity) {
             @SuppressLint("CutPasteId", "SetTextI18n", "SimpleDateFormat")
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
-                    val intent = Intent(activity, HomeActivity::class.java)
                     GetSettings(activity).save(TOKEN, response.body().toString())
+                    Thread(Runnable {
+                        Log.d("courier_log", "(MainActivity Перехожу в PingServer")
+                        PingServer(activity).connection()
+                    }).start()
+                    Rabbit(activity).startListening()
+                    Rabbit(activity).sendMessage(GetSettings(activity).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
+                    Thread(Runnable {
+                        SendLocation(activity).requestLocation(activity)
+                    }).start()
+
+
+
+                    val intent = Intent(activity, HomeActivity::class.java)
+
                     Toast.makeText(activity.applicationContext, "Вы успешно прошли регистрацию", Toast.LENGTH_LONG).show()
                     activity.startActivity(intent)
                 }
@@ -108,6 +121,13 @@ class Http(private var activity: AppCompatActivity) {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
                     GetSettings(activity).save(TOKEN, response.body().toString())
+                    Rabbit(activity).startListening()
+                    Rabbit(activity).sendMessage(GetSettings(activity).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
+                    Thread(Runnable {
+                        SendLocation(activity).requestLocation(activity)
+                    }).start()
+
+
                     val intent = Intent(activity, HomeActivity::class.java)
                     activity.startActivity(intent)
                 }
@@ -139,11 +159,8 @@ class Http(private var activity: AppCompatActivity) {
                     if (response.body() == "false") {
                         drawSwitch(false)
                     } else if (response.body() == "true") {
-                        Log.d("courier_log", "A1 - " + System.currentTimeMillis().toString())
                         drawSwitch(true)
                     } else {
-                        //Log.d("courier_log", "Response Body: $response")
-                        Log.d("courier_log", "A1 - " + System.currentTimeMillis().toString())
                         Toast.makeText(activity, "Response Body: $response", Toast.LENGTH_LONG).show()
                     }
                 } else {
@@ -169,13 +186,9 @@ class Http(private var activity: AppCompatActivity) {
         if(boolean){
             switch.text = "Свободен"
             switch.setTextColor(colorGreen)
-//            val thumbColor = ColorStateList.valueOf(colorGreen)
-//            switch.setBackgroundColor(thumbColor)
         } else {
             switch.text = "Занят"
             switch.setTextColor(colorRed)
-//            val thumbColor = ColorStateList.valueOf(colorRed)
-//            switch.thumbTintList = thumbColor
         }
     }
 }

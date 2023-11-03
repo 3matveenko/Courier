@@ -124,7 +124,7 @@ class HomeActivity : AppCompatActivity() {
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("courier_log", "(HomeActivity)  onCreate")
-        Rabbit(applicationContext).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
@@ -180,6 +180,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        Rabbit(applicationContext).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
     }
 
     private val onBackPressedCallback: OnBackPressedCallback =

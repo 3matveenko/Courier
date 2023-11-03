@@ -70,7 +70,7 @@ class NewOrderActivity : AppCompatActivity() {
             intentMESSAGE.putExtra("body", message)
             LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intentMESSAGE)
 
-            val token = GetSettings(this).load("token").toString()
+            val token = GetSettings(this).load("token")
             if(reject == null){
                 Rabbit(this).sendMessage(token,"accept_order","ok")
             } else {

@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                     if(isNotNull(setting)){
                         GetSettings(applicationContext).save(GetSettings.PROTOCOL,setting.protocol)
                         GetSettings(applicationContext).save(GetSettings.BACK_QUEUE_NAME,setting.backQueueName)
-                        GetSettings(applicationContext).save(GetSettings.SERVER_NAME,setting.serverName)
+                        GetSettings(applicationContext).save(SERVER_NAME,setting.serverName)
                         GetSettings(applicationContext).save(GetSettings.SERVER_PORT,setting.serverPort)
                         GetSettings(applicationContext).save(GetSettings.RABBIT_SERVER_NAME,setting.rabbitServerName)
                         GetSettings(applicationContext).save(GetSettings.RABBIT_SERVER_PORT,setting.rabbitServerPort)
