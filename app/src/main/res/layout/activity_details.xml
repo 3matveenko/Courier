@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".activity.DetailsActivity">
 
+    <View
+        android:id="@+id/lineView7"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_centerInParent="true"
+        android:background="?attr/detailsTitle"
+        app:layout_constraintBottom_toTopOf="@+id/phone_number_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -68,9 +80,9 @@
         android:layout_height="1dp"
         android:layout_centerInParent="true"
         android:background="?attr/detailsTitle"
-        app:layout_constraintBottom_toTopOf="@+id/phone_number_title"
+        app:layout_constraintBottom_toTopOf="@+id/textView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints" />
 
@@ -142,9 +154,9 @@
         android:text="@string/address_delivery"
         android:textColor="?attr/detailsTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.003"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phone_number_text" />
+        app:layout_constraintTop_toBottomOf="@+id/comment" />
 
     <TextView
         android:id="@+id/address_text"
@@ -270,6 +282,28 @@
         android:text="@string/check"
         app:layout_constraintBottom_toBottomOf="@+id/send_sms"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        android:textColor="?attr/detailsTitle"
+        android:text="@string/comment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phone_number_text" />
+
+    <TextView
+        android:id="@+id/comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="25dp"
+        android:text="TextView"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

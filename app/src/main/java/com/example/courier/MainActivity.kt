@@ -1,8 +1,11 @@
 package com.example.courier
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -42,6 +45,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
+
+        val connManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo: NetworkInfo? = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+        if(networkInfo?.isConnected != true){
+            Toast.makeText(this,"Отключите Wi-Fi!",Toast.LENGTH_LONG).show()
+            //finish()
+        }
+
         Log.d("courier_log", "MainActivity ***START app Courier***")
         if (!GetSettings(this).isNull(SERVER_NAME)) {
             Thread(Runnable {

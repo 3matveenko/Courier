@@ -41,6 +41,7 @@ class DetailsActivity : AppCompatActivity() {
         var editCode = findViewById<EditText>(R.id.editCode)
         val checkedButton = findViewById<Button>(R.id.checkButton)
         val rejectedTextView = findViewById<TextView>(R.id.rejectedView)
+        val comment = findViewById<TextView>(R.id.comment)
 
         val orderString:String = intent.getStringExtra("order").toString()
         val gson = GsonBuilder()
@@ -62,6 +63,7 @@ class DetailsActivity : AppCompatActivity() {
         phoneNumber.text = order.phone
         address.text = order.address
         time.text = SimpleDateFormat("HH:mm").format(order.dateStart)
+        comment.text = order.comment
 
         if(GetSettings(this).isNull("id_"+order.id)){
             editCode.visibility = View.GONE
@@ -131,23 +133,30 @@ class DetailsActivity : AppCompatActivity() {
         }
 
         checkedButton.setOnClickListener {
-                editCode = findViewById(R.id.editCode)
-                if(GetSettings(this).load("id_"+order.id)==editCode.text.toString()){
-                    GetSettings(this).remove("id_"+order.id)
-                    Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
-                    val token = GetSettings(this).load(GetSettings.TOKEN)
-                    Rabbit(this).sendMessage(token,"order_success",order.id.toString())
-                    startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
-                    finish()
-                } else {
-                    Toast.makeText(this,"Код введен не верно!",Toast.LENGTH_LONG).show()
-                    editCode.text.clear()
-                }
+            editCode = findViewById(R.id.editCode)
+            if(GetSettings(this).load("id_"+order.id)==editCode.text.toString()){
+                GetSettings(this).remove("id_"+order.id)
+                Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
+                val token = GetSettings(this).load(GetSettings.TOKEN)
+                Rabbit(this).sendMessage(token,"order_success",order.id.toString())
+                startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
+                finish()
+            } else {
+                Toast.makeText(this,"Код введен не верно!",Toast.LENGTH_LONG).show()
+                editCode.text.clear()
+            }
         }
 
         phoneNumber.setOnClickListener{
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("", order.phone)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(this, "Скопировано", Toast.LENGTH_SHORT).show()
+        }
+
+        address.setOnClickListener{
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("", order.address)
             clipboard.setPrimaryClip(clip)
             Toast.makeText(this, "Скопировано", Toast.LENGTH_SHORT).show()
         }

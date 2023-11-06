@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.Process
@@ -124,8 +126,15 @@ class HomeActivity : AppCompatActivity() {
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("courier_log", "(HomeActivity)  onCreate")
-
         super.onCreate(savedInstanceState)
+
+
+        val connManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo: NetworkInfo? = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+        if(networkInfo?.isConnected == true){
+            Toast.makeText(this,"Отключите Wi-Fi!",Toast.LENGTH_LONG).show()
+            //finish()
+        }
         setContentView(R.layout.activity_home)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val switch = findViewById<Button>(R.id.switchView)

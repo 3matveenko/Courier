@@ -117,7 +117,10 @@ data class Order(
     val longitude:Double,
 
     @SerializedName(value = "rejectOrder")
-    val rejectOrder:RejectOrder
+    val rejectOrder:RejectOrder,
+
+    @SerializedName(value = "comment")
+    val comment:String
 )
 
 data class RejectOrder(

@@ -33,4 +33,5 @@
     <string name="logout">Сменить аккаунт</string>
     <string name="rejaction_reason">Назовите причину отказа</string>
     <string name="Textview_reject_order">Отказ от всех не доставленных заказов.</string>
+    <string name="comment">Комментарий</string>
 </resources>
