@@ -1,7 +1,6 @@
 package com.example.courier.connect
 
-import android.Manifest
-import android.app.Activity
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,12 +8,12 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LocationMy
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -24,7 +23,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 
-class SendLocation(context: Context) : LocationListener {
+class SendLocation(context: Context) : LocationListener , Service() {
 
     private val _context:Context = context
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -58,9 +57,8 @@ class SendLocation(context: Context) : LocationListener {
         context.startActivity(intent)
     }
     fun requestLocation(context:Context) {
-
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-         if (ActivityCompat.checkSelfPermission(
+            if (ActivityCompat.checkSelfPermission(
                     context,
                     android.Manifest.permission.ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED &&
@@ -68,7 +66,7 @@ class SendLocation(context: Context) : LocationListener {
                     context,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
-                ) {
+            ) {
                 val locationCallback = object : LocationCallback() {
                     override fun onLocationResult(locationResult: LocationResult) {
                         super.onLocationResult(locationResult)
@@ -85,17 +83,28 @@ class SendLocation(context: Context) : LocationListener {
                     }
                 }
 
-             try {
-                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-                 val locationRequest = LocationRequest()
-                 locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                 locationRequest.interval = 60000
-                 locationRequest.smallestDisplacement = 50.0f
-                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
-             } catch (e: Exception){
-                 Log.e("courier_log", "SendLocation Ошибка получения координат")
-                 Toast.makeText(context.applicationContext, "Ошибка получения координат", Toast.LENGTH_LONG).show()
-             }
-        }
+                try {
+                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+                    val locationRequest = LocationRequest.create()
+                        .setInterval(60000) // Интервал получения локации в миллисекундах (в данном случае, 1 минута)
+                        .setFastestInterval(30000)
+                        .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
+                        .setSmallestDisplacement(10.0f)
+                    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+                } catch (e: Exception){
+                    Log.e("courier_log", "SendLocation Ошибка получения координат")
+                    Toast.makeText(context.applicationContext, "Ошибка получения координат", Toast.LENGTH_LONG).show()
+                }
+            }
+            //Thread.sleep(60000)
+
+
+
+
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        TODO("Not yet implemented")
+        return null
     }
 }

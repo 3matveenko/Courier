@@ -122,7 +122,7 @@ class DetailsActivity : AppCompatActivity() {
                 }
                 editCode.visibility = View.VISIBLE
                 checkedButton.visibility = View.VISIBLE
-                Toast.makeText(this, "Cообщение отправлено! $randomNumber",Toast.LENGTH_LONG).show()
+                //Toast.makeText(this, "Cообщение отправлено! $randomNumber",Toast.LENGTH_LONG).show()
                 Rabbit(this).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"send_sms",gson.toJson(SendSms(order.phone,randomNumber)))
                 dialog.dismiss()
             }
@@ -158,7 +158,15 @@ class DetailsActivity : AppCompatActivity() {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("", order.address)
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(this, "Скопировано", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Скопирован адрес", Toast.LENGTH_SHORT).show()
+        }
+
+        address.setOnLongClickListener {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("", order.latitude.toString()+","+order.longitude.toString())
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(this, "Скопированы координаты", Toast.LENGTH_SHORT).show()
+            true
         }
     }
 }

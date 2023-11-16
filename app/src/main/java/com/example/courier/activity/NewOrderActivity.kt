@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.TranslateAnimation
@@ -30,7 +31,7 @@ class NewOrderActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_order)
-
+        Log.d("courier_log", "(NewOrderActivity открылся активити")
         val mediaPlayer = MediaPlayer.create(applicationContext, R.raw.new_order)
         val vibrator: Vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
@@ -64,6 +65,7 @@ class NewOrderActivity : AppCompatActivity() {
 
 
         findViewById<Button>(R.id.accept).setOnClickListener{
+            Log.d("courier_log", "(NewOrderActivity нажалась кнопка принять заказ")
             val message = intent.getStringExtra("body")
 
             val intentMESSAGE = Intent(HomeActivity.MESSAGE)
@@ -72,8 +74,10 @@ class NewOrderActivity : AppCompatActivity() {
 
             val token = GetSettings(this).load("token")
             if(reject == null){
+                Log.d("courier_log", "(NewOrderActivity отправил accept_order:ok")
                 Rabbit(this).sendMessage(token,"accept_order","ok")
             } else {
+                Log.d("courier_log", "(NewOrderActivity отправил accept_rejected_order:ok")
                 Rabbit(this).sendMessage(token,"accept_rejected_order","ok")
             }
             vibrator.cancel()
@@ -88,6 +92,7 @@ class NewOrderActivity : AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
+                Log.d("courier_log", "(NewOrderActivity вышло время на ответ о принятии заказа")
                 vibrator.cancel()
                 mediaPlayer.release()
                 this@NewOrderActivity.finish()
@@ -97,6 +102,7 @@ class NewOrderActivity : AppCompatActivity() {
         timer.start()
 
         findViewById<Button>(R.id.reject).setOnClickListener{
+            Log.d("courier_log", "(NewOrderActivity нажата кнопка об отказе от заказа")
             vibrator.cancel()
             mediaPlayer.release()
             startActivity(Intent(this@NewOrderActivity, HomeActivity::class.java))

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.MainActivity.Companion.connectionFlag
 import com.example.courier.models.GetSettings
@@ -94,6 +95,8 @@ class Rabbit(private var context: Context) {
                                     LocalBroadcastManager
                                         .getInstance(context)
                                         .sendBroadcast(Intent("my_orders").putExtra("body",message.body))
+                                "send_sms_success"->
+                                    Toast.makeText(context,"сообщение отправлено!",Toast.LENGTH_LONG).show()
                             }
                         }
                     }
@@ -107,6 +110,7 @@ class Rabbit(private var context: Context) {
         }).start()
     }
 
+    @SuppressLint("SuspiciousIndentation")
     fun sendMessage(token:String, code: String, body: String) {
         Thread(Runnable {
             do {
@@ -120,6 +124,8 @@ class Rabbit(private var context: Context) {
                 val gson = Gson()
                 val messageObj = Message(token, code, System.currentTimeMillis(), body)
                 val message = gson.toJson(messageObj)
+
+                    Log.d("courier_log", "Rabbit отправил $message")
 
             executorService.execute {
                     val connection = factory.newConnection()

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
@@ -18,6 +19,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.activity.HomeActivity
 import com.example.courier.activity.RegistrActivity
@@ -46,12 +48,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
 
-        val connManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo: NetworkInfo? = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-        if(networkInfo?.isConnected != true){
-            Toast.makeText(this,"Отключите Wi-Fi!",Toast.LENGTH_LONG).show()
-            //finish()
-        }
+//        val connManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+//        val networkInfo: NetworkInfo? = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+//        if(networkInfo?.isConnected != true){
+//            Toast.makeText(this,"Отключите Wi-Fi!",Toast.LENGTH_LONG).show()
+//            //finish()
+//        }
 
         Log.d("courier_log", "MainActivity ***START app Courier***")
         if (!GetSettings(this).isNull(SERVER_NAME)) {
