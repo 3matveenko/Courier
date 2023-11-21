@@ -21,7 +21,7 @@
     <string name="orders_number">Номер заказа</string>
     <string name="add_time_title">Принят</string>
     <string name="phone_number_title">Номер телефона</string>
-    <string name="send_sms">Отправить sms</string>
+    <string name="send_sms">закрыть заказ</string>
     <string name="back">Назад</string>
     <string name="send_sms_request">Отправить смс клиенту?</string>
     <string name="yes">Да</string>
@@ -34,4 +34,5 @@
     <string name="rejaction_reason">Назовите причину отказа</string>
     <string name="Textview_reject_order">Отказ от всех не доставленных заказов.</string>
     <string name="comment">Комментарий</string>
+    <string name="close_no_sms">Закрыть заказ без смс</string>
 </resources>

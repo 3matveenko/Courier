@@ -42,6 +42,7 @@ class DetailsActivity : AppCompatActivity() {
         val checkedButton = findViewById<Button>(R.id.checkButton)
         val rejectedTextView = findViewById<TextView>(R.id.rejectedView)
         val comment = findViewById<TextView>(R.id.comment)
+        val token = GetSettings(this).load(GetSettings.TOKEN)
 
         val orderString:String = intent.getStringExtra("order").toString()
         val gson = GsonBuilder()
@@ -126,6 +127,13 @@ class DetailsActivity : AppCompatActivity() {
                 Rabbit(this).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"send_sms",gson.toJson(SendSms(order.phone,randomNumber)))
                 dialog.dismiss()
             }
+                dialogView.findViewById<Button>(R.id.close_no_sms).setOnClickListener {
+                    GetSettings(this).remove("id_"+order.id)
+                    Toast.makeText(this,"Заказ доставлен без подтверждения",Toast.LENGTH_LONG).show()
+                    Rabbit(this).sendMessage(token,"order_success_not_sold",order.id.toString())
+                    startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
+                    finish()
+                }
             dialog.show()
             } else {
                 Toast.makeText(this,"Нет интернета!",Toast.LENGTH_SHORT).show()
@@ -134,14 +142,8 @@ class DetailsActivity : AppCompatActivity() {
 
         checkedButton.setOnClickListener {
             editCode = findViewById(R.id.editCode)
-            val token = GetSettings(this).load(GetSettings.TOKEN)
-            if(editCode.text.toString()=="0000"){
-                GetSettings(this).remove("id_"+order.id)
-                Toast.makeText(this,"Заказ доставлен без подтверждения",Toast.LENGTH_LONG).show()
-                Rabbit(this).sendMessage(token,"order_success_not_sold",order.id.toString())
-                startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
-                finish()
-            } else {
+
+
                 if(GetSettings(this).load("id_"+order.id)==editCode.text.toString()){
                     GetSettings(this).remove("id_"+order.id)
                     Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
@@ -152,7 +154,6 @@ class DetailsActivity : AppCompatActivity() {
                     Toast.makeText(this,"Код введен не верно!",Toast.LENGTH_LONG).show()
                     editCode.text.clear()
                 }
-            }
         }
 
         phoneNumber.setOnClickListener{

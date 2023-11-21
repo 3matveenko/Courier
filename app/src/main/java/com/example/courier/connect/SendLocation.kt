@@ -1,6 +1,9 @@
 package com.example.courier.connect
 
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -8,6 +11,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.Looper
@@ -16,6 +20,8 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import com.example.courier.R
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LocationMy
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -30,14 +36,21 @@ class SendLocation() : LocationListener , Service() {
 
 //    private val _context:Context = context
 
+    private var shouldContinue = true
+
     private val executor = Executors.newSingleThreadExecutor()
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+        val notification = createNotification()
+
+        // Вызов startForeground с соответствующими параметрами
+        startForeground(72018, notification)
+
         executor.submit {
-            requestLocation(applicationContext)
+          requestLocation(applicationContext)
         }
 //        val backgroundThread = Thread {
 //            requestLocation(applicationContext)
@@ -49,19 +62,40 @@ class SendLocation() : LocationListener , Service() {
         return START_STICKY
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        stopLocationUpdates()
+    }
+
+    fun stopLocationUpdates() {
+        shouldContinue = false
+
+    }
+
+    private fun createNotification(): Notification {
+        Log.d("courier_log", "(SendLocation создал уведомление")
+        val channelId = "72018"
+        val channelName = "Courier"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val notificationChannel = NotificationChannel(channelId, channelName, importance)
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setContentTitle("Курьер")
+            .setSmallIcon(R.drawable.truck)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        return notificationBuilder.build()
+    }
+
 
     override fun onLocationChanged(location: Location) {
     }
 
      override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
     }
-
-//    fun request(){
-//        while (true){
-//            Thread.sleep(10000)
-//            checkLocationStatus(_context)
-//        }
-//    }
 
     fun isLocationEnabled(context: Context): Boolean {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -80,7 +114,8 @@ class SendLocation() : LocationListener , Service() {
         context.startActivity(intent)
     }
     fun requestLocation(context:Context) {
-        while (true){
+        Log.d("courier_log", "(SendLocation запустил бесконечный цикл")
+        while (shouldContinue){
 
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
@@ -112,7 +147,7 @@ class SendLocation() : LocationListener , Service() {
                             } else {
                                 // Местоположение не доступно
                                 Log.e("courier_log", "SendLocation Местоположение не доступно")
-                                Toast.makeText(context.applicationContext, "Местоположение не доступно", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context.applicationContext, "Включите геолокацию!", Toast.LENGTH_LONG).show()
                             }
                         }
                 } catch (e: Exception) {
