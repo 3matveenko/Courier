@@ -138,7 +138,7 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val switch = findViewById<Button>(R.id.switchView)
-        val goToSetting = findViewById<ImageButton>(R.id.go_to_settings)
+        val goToSetting = findViewById<Button>(R.id.go_to_settings)
         goToSetting.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)
             startActivity(intent)

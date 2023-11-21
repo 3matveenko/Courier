@@ -10,6 +10,7 @@ import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -17,6 +18,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -43,10 +45,16 @@ class MainActivity : AppCompatActivity() {
     companion object{
         var connectionFlag:Boolean = false
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login)
+
+        val mgr = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+        @SuppressLint("InvalidWakeLockTag")
+        val wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock")
+        wakeLock.acquire()
 
 //        val connManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 //        val networkInfo: NetworkInfo? = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
@@ -81,9 +89,12 @@ class MainActivity : AppCompatActivity() {
         Log.d("courier_log", "MainActivity token = $token")
         if (!GetSettings(this).isNull(TOKEN)){
             Rabbit(applicationContext).startListening()
-            Thread(Runnable {
-                SendLocation(this).requestLocation(this)
-            }).start()
+
+
+                val serviceIntent = Intent(this, SendLocation::class.java)
+                startForegroundService(serviceIntent)
+
+
             startActivity(Intent(this@MainActivity, HomeActivity::class.java))
         }
 

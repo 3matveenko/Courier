@@ -78,6 +78,7 @@ class Http(private var activity: AppCompatActivity) {
             @SuppressLint("CutPasteId", "SetTextI18n", "SimpleDateFormat")
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
+
                     GetSettings(activity).save(TOKEN, response.body().toString())
                     Thread(Runnable {
                         Log.d("courier_log", "(MainActivity Перехожу в PingServer")
@@ -86,7 +87,7 @@ class Http(private var activity: AppCompatActivity) {
                     Rabbit(activity).startListening()
                     Rabbit(activity).sendMessage(GetSettings(activity).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
                     Thread(Runnable {
-                        SendLocation(activity).requestLocation(activity)
+                        SendLocation().requestLocation(activity)
                     }).start()
 
 
@@ -123,9 +124,9 @@ class Http(private var activity: AppCompatActivity) {
                     GetSettings(activity).save(TOKEN, response.body().toString())
                     Rabbit(activity).startListening()
                     Rabbit(activity).sendMessage(GetSettings(activity).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
-                    Thread(Runnable {
-                        SendLocation(activity).requestLocation(activity)
-                    }).start()
+//                    Thread(Runnable {
+//                        SendLocation(activity).requestLocation(activity)
+//                    }).start()
 
 
                     val intent = Intent(activity, HomeActivity::class.java)

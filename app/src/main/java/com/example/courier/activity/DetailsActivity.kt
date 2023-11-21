@@ -134,16 +134,24 @@ class DetailsActivity : AppCompatActivity() {
 
         checkedButton.setOnClickListener {
             editCode = findViewById(R.id.editCode)
-            if(GetSettings(this).load("id_"+order.id)==editCode.text.toString()){
+            val token = GetSettings(this).load(GetSettings.TOKEN)
+            if(editCode.text.toString()=="0000"){
                 GetSettings(this).remove("id_"+order.id)
-                Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
-                val token = GetSettings(this).load(GetSettings.TOKEN)
-                Rabbit(this).sendMessage(token,"order_success",order.id.toString())
+                Toast.makeText(this,"Заказ доставлен без подтверждения",Toast.LENGTH_LONG).show()
+                Rabbit(this).sendMessage(token,"order_success_not_sold",order.id.toString())
                 startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
                 finish()
             } else {
-                Toast.makeText(this,"Код введен не верно!",Toast.LENGTH_LONG).show()
-                editCode.text.clear()
+                if(GetSettings(this).load("id_"+order.id)==editCode.text.toString()){
+                    GetSettings(this).remove("id_"+order.id)
+                    Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
+                    Rabbit(this).sendMessage(token,"order_success",order.id.toString())
+                    startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
+                    finish()
+                } else {
+                    Toast.makeText(this,"Код введен не верно!",Toast.LENGTH_LONG).show()
+                    editCode.text.clear()
+                }
             }
         }
 
