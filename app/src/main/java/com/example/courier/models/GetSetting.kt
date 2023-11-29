@@ -3,47 +3,75 @@ package com.example.courier.models
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.courier.enums.SettingsValue
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import java.lang.reflect.Modifier
 
 class GetSettings(context: Context) {
 
     companion object {
-        //const
-        const val TOKEN = "token"
+        var settings: Setting = Setting()
 
-        const val HTTP_TOKEN = "gYIABBFGDkyCwg"
-        //var
-        const val PROTOCOL = "protocol"
-
-        const val BACK_QUEUE_NAME = "back_queue_name"
-
-        const val SERVER_NAME = "server_name"
-
-        const val SERVER_PORT = "server_port"
-
-        const val RABBIT_SERVER_NAME = "rabbit_server_name"
-
-        const val RABBIT_SERVER_PORT = "rabbit_server_port"
-
-        const val RABBIT_USERNAME = "rabbit_username"
-
-        const val RABBIT_PASSWORD = "rabbit_password"
-
-
+        val gson: Gson = GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+            .excludeFieldsWithModifiers(
+                Modifier.STATIC,
+                Modifier.TRANSIENT,
+                Modifier.VOLATILE
+            )
+            .create()
 
     }
     private var sharedPreferences: SharedPreferences
     init {
-        sharedPreferences = context.getSharedPreferences("courier", Context.MODE_PRIVATE)
+        sharedPreferences = context.getSharedPreferences("com.example.courier", Context.MODE_PRIVATE)
+
+        settings.token = load(SettingsValue.TOKEN)
+        settings.protocol = load(SettingsValue.PROTOCOL)
+        settings.serverName = load(SettingsValue.TOKEN)
+        settings.serverPort = loadInt(SettingsValue.SERVER_NAME)
+        settings.backQueueName = load(SettingsValue.SERVER_PORT)
+        settings.rabbitUsername = load(SettingsValue.RABBIT_USERNAME)
+        settings.rabbitPassword = load(SettingsValue.RABBIT_PASSWORD)
+        settings.rabbitServerName = load(SettingsValue.RABBIT_SERVER_NAME)
+        settings.rabbitServerPort = loadInt(SettingsValue.RABBIT_SERVER_PORT)
+    }
+
+    fun getURI(): String {
+        return settings.protocol + "://" + settings.serverName + ":" + settings.serverPort
+    }
+
+    fun load(key: SettingsValue): String {
+        return sharedPreferences.getString(key.value, "") ?: return ""
+    }
+
+    private fun loadInt(key: SettingsValue): Int {
+        return sharedPreferences.getInt(key.value, 0)
     }
 
     fun load(key: String): String {
-        return sharedPreferences.getString(key, "") ?: return ""
+        return sharedPreferences.getString(key.toString(), "") ?: return ""
     }
 
     @SuppressLint("CommitPrefEdits")
-    fun save(key: String, string: String) {
+    fun save(key: SettingsValue, string: String) {
         val sharedPreferencesEditor = sharedPreferences.edit()
-        sharedPreferencesEditor.putString(key, string)
+        sharedPreferencesEditor.putString(key.toString(), string)
+        sharedPreferencesEditor.apply()
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    fun save(key: String, value: String) {
+        val sharedPreferencesEditor = sharedPreferences.edit()
+        sharedPreferencesEditor.putString(key, value)
+        sharedPreferencesEditor.apply()
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    fun saveInt(key: SettingsValue, value: Int) {
+        val sharedPreferencesEditor = sharedPreferences.edit()
+        sharedPreferencesEditor.putInt(key.value, value)
         sharedPreferencesEditor.apply()
     }
 
@@ -55,9 +83,19 @@ class GetSettings(context: Context) {
     }
 
     fun isNull(key: String): Boolean {
-        if (load(key) == "") {
-            return true
+        return sharedPreferences.getString(key, "").toString().isEmpty()
+    }
+    fun isNull(key: SettingsValue): Boolean {
+        return when (key) {
+            SettingsValue.TOKEN -> settings.token.isEmpty()
+            SettingsValue.PROTOCOL -> settings.protocol.isEmpty()
+            SettingsValue.SERVER_NAME -> settings.serverName.isEmpty()
+            SettingsValue.SERVER_PORT -> settings.serverPort == 0
+            SettingsValue.BACK_QUEUE_NAME -> settings.backQueueName.isEmpty()
+            SettingsValue.RABBIT_USERNAME -> settings.rabbitUsername.isEmpty()
+            SettingsValue.RABBIT_PASSWORD -> settings.rabbitPassword.isEmpty()
+            SettingsValue.RABBIT_SERVER_NAME -> settings.rabbitServerName.isEmpty()
+            SettingsValue.RABBIT_SERVER_PORT -> settings.rabbitServerPort == 0
         }
-        return false
     }
 }

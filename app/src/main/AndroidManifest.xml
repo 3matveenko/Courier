@@ -78,6 +78,11 @@
             android:enabled="true"
             android:exported="true"
             tools:ignore="WrongManifestParent" />
+        <service
+            android:name=".connect.PingServer"
+            android:enabled="true"
+            android:exported="true"
+            tools:ignore="WrongManifestParent" />
 
         <receiver
             android:name=".connect.MyBroadcastReceiver"

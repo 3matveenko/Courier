@@ -7,8 +7,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.MainActivity.Companion.connectionFlag
+import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
-import com.example.courier.models.GetSettings.Companion.TOKEN
 import com.example.courier.models.Message
 import com.google.gson.Gson
 import com.rabbitmq.client.AMQP
@@ -25,14 +25,14 @@ class Rabbit(private var context: Context) {
         private var channel: Channel? = null
     }
 
-     private val queueName: String? = GetSettings(context).load(TOKEN)
+     private val queueName: String? = GetSettings(context).load(SettingsValue.TOKEN)
 
     private fun createFactory(): ConnectionFactory {
         val factory = ConnectionFactory()
-        factory.host = GetSettings(context).load(GetSettings.RABBIT_SERVER_NAME)
-        factory.port = GetSettings(context).load(GetSettings.RABBIT_SERVER_PORT).toInt()
-        factory.username = GetSettings(context).load(GetSettings.RABBIT_USERNAME)
-        factory.password = GetSettings(context).load(GetSettings.RABBIT_PASSWORD)
+        factory.host = GetSettings(context).load(SettingsValue.RABBIT_SERVER_NAME)
+        factory.port = GetSettings(context).load(SettingsValue.RABBIT_SERVER_PORT).toInt()
+        factory.username = GetSettings(context).load(SettingsValue.RABBIT_USERNAME)
+        factory.password = GetSettings(context).load(SettingsValue.RABBIT_PASSWORD)
         return factory
     }
     @SuppressLint("SuspiciousIndentation")
@@ -117,7 +117,7 @@ class Rabbit(private var context: Context) {
                 var flag = false
                 if(connectionFlag){
                 val factory = createFactory()
-                val queueName = GetSettings(context).load(GetSettings.BACK_QUEUE_NAME)
+                val queueName = GetSettings(context).load(SettingsValue.BACK_QUEUE_NAME)
 
                 val executorService = Executors.newSingleThreadExecutor()
 
@@ -138,8 +138,8 @@ class Rabbit(private var context: Context) {
             executorService.shutdown()
                     Log.d("courier_log", "Rabbit sendMessage ok")
                 } else {
-                    Log.e("courier_log", "Rabbit sendMessage disconnect")
                     Thread.sleep(1000)
+                    Log.e("courier_log", "Rabbit sendMessage disconnect")
                     flag = true
                 }
             } while (flag)

@@ -15,6 +15,7 @@ import com.example.courier.R
 import com.example.courier.models.CreateDriver
 import com.example.courier.models.GetSettings
 import com.example.courier.connect.Http
+import com.example.courier.enums.SettingsValue
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 
@@ -72,8 +73,8 @@ class RegistrActivity : AppCompatActivity() {
                 Toast.makeText(this, "Сканирование отменено", Toast.LENGTH_SHORT).show()
                 finish()
             } else {
-                GetSettings(applicationContext).save(GetSettings.SERVER_NAME,result.contents)
-                Toast.makeText(this, GetSettings(applicationContext).load(GetSettings.SERVER_NAME), Toast.LENGTH_LONG).show()
+                GetSettings(applicationContext).save(SettingsValue.SERVER_NAME,result.contents)
+                Toast.makeText(this, GetSettings(applicationContext).load(SettingsValue.SERVER_NAME), Toast.LENGTH_LONG).show()
                 this.recreate()
             }
         }

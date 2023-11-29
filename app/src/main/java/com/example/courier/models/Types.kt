@@ -30,31 +30,34 @@ data class Token(
 )
 
 data class Setting(
+    var token:String,
 
     @SerializedName(value = "protocol")
-    val protocol:String,
+    var protocol:String,
 
     @SerializedName(value = "serverName")
-    val serverName:String,
+    var serverName:String,
 
     @SerializedName(value = "serverPort")
-    val serverPort : String,
+    var serverPort : Int,
 
     @SerializedName(value = "backQueueName")
-    val backQueueName : String,
+    var backQueueName : String,
 
     @SerializedName(value = "rabbitServerName")
-    val rabbitServerName:String,
+    var rabbitServerName:String,
 
     @SerializedName(value = "rabbitServerPort")
-     val rabbitServerPort : String,
+    var rabbitServerPort : Int,
 
     @SerializedName(value = "rabbitUsername")
-     val rabbitUsername : String,
+    var rabbitUsername : String,
 
     @SerializedName(value = "rabbitPassword")
-     val rabbitPassword : String,
-)
+    var rabbitPassword : String,
+){
+    constructor() : this("", "", "", 0, "", "", 0, "", "")
+}
 
 data class Message(
 

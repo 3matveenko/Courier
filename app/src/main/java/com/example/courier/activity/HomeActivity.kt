@@ -14,10 +14,8 @@ import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.ProgressBar
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -28,6 +26,7 @@ import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.connect.Http
 import com.example.courier.connect.Rabbit
+import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
 import com.example.courier.models.Message
 import com.example.courier.models.Order
@@ -189,7 +188,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-        Rabbit(applicationContext).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
+        Rabbit(applicationContext).sendMessage(GetSettings(this).load(SettingsValue.TOKEN),"get_my_orders_status_progressing","")
     }
 
     private val onBackPressedCallback: OnBackPressedCallback =

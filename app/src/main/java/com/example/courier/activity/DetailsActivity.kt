@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.connect.Rabbit
+import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
 import com.example.courier.models.Order
 import com.example.courier.models.SendSms
@@ -42,7 +43,7 @@ class DetailsActivity : AppCompatActivity() {
         val checkedButton = findViewById<Button>(R.id.checkButton)
         val rejectedTextView = findViewById<TextView>(R.id.rejectedView)
         val comment = findViewById<TextView>(R.id.comment)
-        val token = GetSettings(this).load(GetSettings.TOKEN)
+        val token = GetSettings(this).load(SettingsValue.TOKEN)
 
         val orderString:String = intent.getStringExtra("order").toString()
         val gson = GsonBuilder()
@@ -88,7 +89,7 @@ class DetailsActivity : AppCompatActivity() {
                 dialogView.findViewById<Button>(R.id.button_send_comment_reject_order).setOnClickListener {
                     val comment = dialogView.findViewById<EditText>(R.id.commentRejectEditText)
                     if(comment.text.toString() != ""){
-                        Rabbit(this).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"reject_order",comment.text.toString())
+                        Rabbit(this).sendMessage(GetSettings(this).load(SettingsValue.TOKEN),"reject_order",comment.text.toString())
                         dialog.dismiss()
                         startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
                         finish()
@@ -124,7 +125,7 @@ class DetailsActivity : AppCompatActivity() {
                 editCode.visibility = View.VISIBLE
                 checkedButton.visibility = View.VISIBLE
                 //Toast.makeText(this, "Cообщение отправлено! $randomNumber",Toast.LENGTH_LONG).show()
-                Rabbit(this).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"send_sms",gson.toJson(SendSms(order.phone,randomNumber)))
+                Rabbit(this).sendMessage(GetSettings(this).load(SettingsValue.TOKEN),"send_sms",gson.toJson(SendSms(order.phone,randomNumber)))
                 dialog.dismiss()
             }
                 dialogView.findViewById<Button>(R.id.close_no_sms).setOnClickListener {

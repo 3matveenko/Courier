@@ -3,11 +3,9 @@ package com.example.courier.connect
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Build
 import android.util.Log
 import android.widget.Button
-import android.widget.Switch
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -15,9 +13,9 @@ import androidx.core.content.ContextCompat
 import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.activity.HomeActivity
+import com.example.courier.enums.SettingsValue
 import com.example.courier.models.CreateDriver
 import com.example.courier.models.GetSettings
-import com.example.courier.models.GetSettings.Companion.TOKEN
 import com.example.courier.models.LoginDriver
 import com.example.courier.models.Message
 import com.google.gson.Gson
@@ -29,7 +27,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Modifier
-import java.util.Date
 
 @SuppressLint("SuspiciousIndentation")
 class Http(private var activity: AppCompatActivity) {
@@ -49,10 +46,7 @@ class Http(private var activity: AppCompatActivity) {
         do {
             var flag = false
             if (MainActivity.connectionFlag) {
-                val server: String =
-                    GetSettings(activity).load(GetSettings.PROTOCOL) + "://"+
-                            GetSettings(activity).load(GetSettings.SERVER_NAME) + ":" +
-                            GetSettings(activity).load(GetSettings.SERVER_PORT)
+                val server: String =GetSettings(activity).getURI()
                 Log.e("courier_log", "retrofit init $server")
                 val retrofit = server.let {
                     Retrofit.Builder()
@@ -79,13 +73,13 @@ class Http(private var activity: AppCompatActivity) {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
 
-                    GetSettings(activity).save(TOKEN, response.body().toString())
-                    Thread(Runnable {
-                        Log.d("courier_log", "(MainActivity Перехожу в PingServer")
-                        PingServer(activity).connection()
-                    }).start()
+                    GetSettings(activity).save(SettingsValue.TOKEN, response.body().toString())
+//                    Thread(Runnable {
+//                        Log.d("courier_log", "(MainActivity Перехожу в PingServer")
+//                        PingServer().connection()
+//                    }).start()
                     Rabbit(activity).startListening()
-                    Rabbit(activity).sendMessage(GetSettings(activity).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
+                    Rabbit(activity).sendMessage(GetSettings(activity).load(SettingsValue.TOKEN),"get_my_orders_status_progressing","")
                     Thread(Runnable {
                         SendLocation().requestLocation(activity)
                     }).start()
@@ -121,9 +115,9 @@ class Http(private var activity: AppCompatActivity) {
             @SuppressLint("CutPasteId", "SetTextI18n", "SimpleDateFormat")
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
-                    GetSettings(activity).save(TOKEN, response.body().toString())
+                    GetSettings(activity).save(SettingsValue.TOKEN, response.body().toString())
                     Rabbit(activity).startListening()
-                    Rabbit(activity).sendMessage(GetSettings(activity).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
+                    Rabbit(activity).sendMessage(GetSettings(activity).load(SettingsValue.TOKEN),"get_my_orders_status_progressing","")
 //                    Thread(Runnable {
 //                        SendLocation(activity).requestLocation(activity)
 //                    }).start()

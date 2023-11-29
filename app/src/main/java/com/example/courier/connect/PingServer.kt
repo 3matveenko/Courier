@@ -1,39 +1,34 @@
 package com.example.courier.connect
 
+import android.app.Service
 import android.content.Context
+import android.content.Intent
+import android.os.IBinder
 import android.util.Log
 import com.example.courier.MainActivity.Companion.connectionFlag
 import com.example.courier.models.GetSettings
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.util.concurrent.Executors
 
-class PingServer(private var context: Context) {
+class PingServer(): Service() {
 
-    fun connection() {
-        Log.d("courier_log", "PingServer запустил пинг")
-        while (true){
-            val backServer: String = GetSettings(context).load(GetSettings.SERVER_NAME)
-            val backServerPort: String = GetSettings(context).load(GetSettings.SERVER_PORT)
-            val rabbitServer: String = GetSettings(context).load(GetSettings.RABBIT_SERVER_NAME)
-            val rabbitServerPort: String = GetSettings(context).load(GetSettings.RABBIT_SERVER_PORT)
-            val socketServer = Socket()
-            val socketRabbit = Socket()
-            try {
-                socketServer.connect(InetSocketAddress(backServer, backServerPort.toInt()), 5000)
-                socketRabbit.connect(InetSocketAddress(rabbitServer, rabbitServerPort.toInt()), 5000)
+    private val executor = Executors.newSingleThreadExecutor()
 
-                connectionFlag = true
+    private lateinit var context: Context
 
-            } catch (e: IOException) {
-                Log.e("courier_log", "PingServer = false $e")
-                connectionFlag = false
-            }
-            finally {
-                socketServer.close()
-                socketRabbit.close()
-            }
-            Thread.sleep(1000)
-        }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+//        executor.submit {
+//            connection()
+//        }
+        return START_STICKY
+    }
+
+
+    override fun onBind(intent: Intent?): IBinder? {
+        TODO("Not yet implemented")
+        return null
     }
 }
