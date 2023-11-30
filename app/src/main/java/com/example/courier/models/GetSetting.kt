@@ -31,7 +31,7 @@ class GetSettings(context: Context) {
         settings.protocol = load(SettingsValue.PROTOCOL)
         settings.serverName = load(SettingsValue.TOKEN)
         settings.serverPort = loadInt(SettingsValue.SERVER_NAME)
-        settings.backQueueName = load(SettingsValue.SERVER_PORT)
+        settings.backQueueName = load(SettingsValue.BACK_QUEUE_NAME)
         settings.rabbitUsername = load(SettingsValue.RABBIT_USERNAME)
         settings.rabbitPassword = load(SettingsValue.RABBIT_PASSWORD)
         settings.rabbitServerName = load(SettingsValue.RABBIT_SERVER_NAME)
@@ -43,7 +43,9 @@ class GetSettings(context: Context) {
     }
 
     fun load(key: SettingsValue): String {
-        return sharedPreferences.getString(key.value, "") ?: return ""
+        var string : String =  sharedPreferences.getString(key.value, "") ?: return ""
+        return string
+
     }
 
     private fun loadInt(key: SettingsValue): Int {
@@ -87,7 +89,7 @@ class GetSettings(context: Context) {
     }
     fun isNull(key: SettingsValue): Boolean {
         return when (key) {
-            SettingsValue.TOKEN -> settings.token.isEmpty()
+            SettingsValue.TOKEN -> settings.token != ""
             SettingsValue.PROTOCOL -> settings.protocol.isEmpty()
             SettingsValue.SERVER_NAME -> settings.serverName.isEmpty()
             SettingsValue.SERVER_PORT -> settings.serverPort == 0

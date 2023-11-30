@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.example.courier.MainActivity
 import com.example.courier.R
+import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LocationMy
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -212,10 +213,10 @@ class SendLocation : LocationListener , Service() {
     fun connection() {
         Log.d("courier_log", "PingServer запустил пинг")
         while (true){
-            val backServer: String = GetSettings(applicationContext).load(GetSettings.SERVER_NAME)
-            val backServerPort: String = GetSettings(applicationContext).load(GetSettings.SERVER_PORT)
-            val rabbitServer: String = GetSettings(applicationContext).load(GetSettings.RABBIT_SERVER_NAME)
-            val rabbitServerPort: String = GetSettings(applicationContext).load(GetSettings.RABBIT_SERVER_PORT)
+            val backServer: String = GetSettings(applicationContext).load(SettingsValue.SERVER_NAME)
+            val backServerPort: String = GetSettings(applicationContext).load(SettingsValue.SERVER_PORT)
+            val rabbitServer: String = GetSettings(applicationContext).load(SettingsValue.RABBIT_SERVER_NAME)
+            val rabbitServerPort: String = GetSettings(applicationContext).load(SettingsValue.RABBIT_SERVER_PORT)
             val socketServer = Socket()
             val socketRabbit = Socket()
             try {

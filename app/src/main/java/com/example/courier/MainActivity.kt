@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         .acquire(1200*60*1000L)
 
         Log.d("courier_log", "MainActivity ***START app Courier***")
-        if (!GetSettings(this).isNull(SettingsValue.SERVER_NAME)) {
+        if (GetSettings(this).isNull(SettingsValue.SERVER_NAME)) {
 //            val pingServerServiceIntent = Intent(this, PingServer::class.java)
 //            startForegroundService(pingServerServiceIntent)
 
@@ -86,13 +86,8 @@ class MainActivity : AppCompatActivity() {
 
         var token = GetSettings(this).load(SettingsValue.TOKEN)
         Log.d("courier_log", "MainActivity token = $token")
-        if (!GetSettings(this).isNull(SettingsValue.TOKEN)) {
+        if (GetSettings(this).isNull(SettingsValue.TOKEN)) {
             Rabbit(applicationContext).startListening()
-
-
-
-
-
             startActivity(Intent(this@MainActivity, HomeActivity::class.java))
         }
 
