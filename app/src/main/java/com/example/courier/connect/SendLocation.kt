@@ -7,6 +7,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -16,6 +17,7 @@ import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.example.courier.MainActivity
@@ -43,6 +45,7 @@ class SendLocation : LocationListener , Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         executor.submit {
@@ -55,8 +58,10 @@ class SendLocation : LocationListener , Service() {
 
         val notification = createNotification()
 
+        notification.visibility = Notification.VISIBILITY_PRIVATE
+
         // Вызов startForeground с соответствующими параметрами
-        startForeground(72018, notification)
+        startForeground(72018, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 //        val backgroundThread = Thread {
 //            requestLocation(applicationContext)
 //        }
@@ -64,7 +69,7 @@ class SendLocation : LocationListener , Service() {
 
 
 
-        return START_STICKY
+        return START_REDELIVER_INTENT
     }
 
     override fun onDestroy() {
