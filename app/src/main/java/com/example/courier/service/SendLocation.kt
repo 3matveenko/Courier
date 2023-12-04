@@ -1,4 +1,4 @@
-package com.example.courier.connect
+package com.example.courier.service
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -20,17 +20,15 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import com.example.courier.MainActivity
+import androidx.core.app.NotificationCompat.VISIBILITY_SECRET
 import com.example.courier.R
-import com.example.courier.enums.SettingsValue
+import com.example.courier.connect.Rabbit
+import com.example.courier.enums.RabbitCode
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LocationMy
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
-import java.io.IOException
-import java.net.InetSocketAddress
-import java.net.Socket
 import java.util.concurrent.Executors
 
 class SendLocation : LocationListener , Service() {
@@ -41,8 +39,6 @@ class SendLocation : LocationListener , Service() {
 
     private val executor = Executors.newSingleThreadExecutor()
 
-    private val executor2 = Executors.newSingleThreadExecutor()
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -52,16 +48,13 @@ class SendLocation : LocationListener , Service() {
           requestLocation(applicationContext)
         }
 
-        executor2.submit {
-            connection()
-        }
-
         val notification = createNotification()
 
-        notification.visibility = Notification.VISIBILITY_PRIVATE
+        notification.visibility = Notification.VISIBILITY_SECRET
 
         // Вызов startForeground с соответствующими параметрами
         startForeground(72018, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+        //startForeground(72018, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 //        val backgroundThread = Thread {
 //            requestLocation(applicationContext)
 //        }
@@ -96,6 +89,7 @@ class SendLocation : LocationListener , Service() {
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Курьер")
             .setSmallIcon(R.drawable.truck)
+            .setVisibility(VISIBILITY_SECRET)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         return notificationBuilder.build()
     }
@@ -150,7 +144,7 @@ class SendLocation : LocationListener , Service() {
                                 val body = gson.toJson(LocationMy(latitude, longitude))
                                 val token = GetSettings(context).load("token")
                                 Log.d("courier_log", "SendLocation передал координаты в Rabbit для отправки = $location")
-                                Rabbit(context).sendMessage(token, "location", body)
+                                Rabbit(context).sendMessage(token, RabbitCode.LOCATION, body)
 
                                 // Закрытие соединения
                                 //fusedLocationClient.removeLocationUpdates(locationCallback)
@@ -215,32 +209,6 @@ class SendLocation : LocationListener , Service() {
 
     }
 
-    fun connection() {
-        Log.d("courier_log", "PingServer запустил пинг")
-        while (true){
-            val backServer: String = GetSettings(applicationContext).load(SettingsValue.SERVER_NAME)
-            val backServerPort: String = GetSettings(applicationContext).load(SettingsValue.SERVER_PORT)
-            val rabbitServer: String = GetSettings(applicationContext).load(SettingsValue.RABBIT_SERVER_NAME)
-            val rabbitServerPort: String = GetSettings(applicationContext).load(SettingsValue.RABBIT_SERVER_PORT)
-            val socketServer = Socket()
-            val socketRabbit = Socket()
-            try {
-                socketServer.connect(InetSocketAddress(backServer, backServerPort.toInt()), 5000)
-                socketRabbit.connect(InetSocketAddress(rabbitServer, rabbitServerPort.toInt()), 5000)
-
-                MainActivity.connectionFlag = true
-
-            } catch (e: IOException) {
-                Log.e("courier_log", "PingServer = false $e")
-                MainActivity.connectionFlag = false
-            }
-            finally {
-                socketServer.close()
-                socketRabbit.close()
-            }
-            Thread.sleep(1000)
-        }
-    }
 
     override fun onBind(intent: Intent?): IBinder? {
         TODO("Not yet implemented")

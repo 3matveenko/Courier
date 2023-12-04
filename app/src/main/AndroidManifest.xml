@@ -9,13 +9,14 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <uses-feature android:name="android.hardware.camera" />
 
@@ -74,14 +75,16 @@
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
         <service
-            android:name=".connect.SendLocation"
+            android:name=".service.SendLocation"
             android:enabled="true"
             android:exported="true"
+            android:foregroundServiceType="location"
             tools:ignore="WrongManifestParent" />
         <service
-            android:name=".connect.PingServer"
+            android:name=".service.RabbitService"
             android:enabled="true"
             android:exported="true"
+            android:foregroundServiceType="dataSync"
             tools:ignore="WrongManifestParent" />
 
         <receiver

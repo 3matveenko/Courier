@@ -39,7 +39,7 @@ data class Setting(
     var serverName:String,
 
     @SerializedName(value = "serverPort")
-    var serverPort : Int,
+    var serverPort : String,
 
     @SerializedName(value = "backQueueName")
     var backQueueName : String,
@@ -48,7 +48,7 @@ data class Setting(
     var rabbitServerName:String,
 
     @SerializedName(value = "rabbitServerPort")
-    var rabbitServerPort : Int,
+    var rabbitServerPort : String,
 
     @SerializedName(value = "rabbitUsername")
     var rabbitUsername : String,
@@ -56,7 +56,7 @@ data class Setting(
     @SerializedName(value = "rabbitPassword")
     var rabbitPassword : String,
 ){
-    constructor() : this("", "", "", 0, "", "", 0, "", "")
+    constructor() : this("", "", "", "0", "", "", "0", "", "")
 }
 
 data class Message(
@@ -71,7 +71,7 @@ data class Message(
     val millisecondsSinceEpoch:Long,
 
     @SerializedName(value = "body")
-    val body:String
+    val body:String = ""
 )
 
 data class LocationMy(

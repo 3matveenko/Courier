@@ -23,7 +23,7 @@ class RegistrActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        if(!GetSettings(this).isNull("token")){
+        if(GetSettings(this).isNull("token")){
             startActivity(Intent(this@RegistrActivity, HomeActivity::class.java))
         }
 
@@ -31,7 +31,7 @@ class RegistrActivity : AppCompatActivity() {
         setContentView(R.layout.activity_registr)
 
         findViewById<Button>(R.id.but_enter).setOnClickListener {
-            if(MainActivity.connectionFlag) {
+//            if(MainActivity.connectionFlag) {
                 val login = findViewById<EditText>(R.id.editEmail).text.toString()
                 val password = findViewById<EditText>(R.id.editPassword).text.toString()
                 val rePassword = findViewById<EditText>(R.id.editPasswordRetype).text.toString()
@@ -53,9 +53,9 @@ class RegistrActivity : AppCompatActivity() {
 
                     Http(this@RegistrActivity).registr(CreateDriver(login, password, name))
                 }
-            } else {
-                Toast.makeText(this, "Нет интернета!", Toast.LENGTH_SHORT).show()
-            }
+//            } else {
+//                Toast.makeText(this, "Нет интернета!", Toast.LENGTH_SHORT).show()
+//            }
         }
 
         findViewById<Button>(R.id.back).setOnClickListener {
@@ -73,8 +73,8 @@ class RegistrActivity : AppCompatActivity() {
                 Toast.makeText(this, "Сканирование отменено", Toast.LENGTH_SHORT).show()
                 finish()
             } else {
-                GetSettings(applicationContext).save(SettingsValue.SERVER_NAME,result.contents)
-                Toast.makeText(this, GetSettings(applicationContext).load(SettingsValue.SERVER_NAME), Toast.LENGTH_LONG).show()
+                GetSettings(applicationContext).save(SettingsValue.SERVER_NAME.value,result.contents)
+                Toast.makeText(this, GetSettings(applicationContext).load(SettingsValue.SERVER_NAME.value), Toast.LENGTH_LONG).show()
                 this.recreate()
             }
         }

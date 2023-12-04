@@ -35,4 +35,34 @@
     <string name="Textview_reject_order">Отказ от всех не доставленных заказов.</string>
     <string name="comment">Комментарий</string>
     <string name="close_no_sms">Закрыть заказ без смс</string>
+
+    <string name="add_reason_for_refusal">Добавьте причину отказа!</string>
+    <string name="no_internet">Нет интернета!</string>
+    <string name="order_delivered_without_confirmation">Заказ доставлен без подтверждения</string>
+    <string name="the_order_was_successfully_delivered">Заказ успешно доставлен</string>
+    <string name="the_code_was_entered_incorrectly">Код введен не верно!</string>
+    <string name="copied">Скопировано</string>
+    <string name="address_copied">Адрес скопирован</string>
+    <string name="coordinates_copied">Координаты скопированы</string>
+    <string name="order">Заказ от</string>
+    <string name="redirected_order">Перенаправленный заказ!</string>
+    <string name="disable_WIFI">Отключите Wi-Fi!</string>
+    <string name="password_mismatch">Пароли не совпадают</string>
+    <string name="field_must_be_filled_in">Поле должно быть заполнено</string>
+    <string name="scan_QRCode">Отсканируйте QR-код у администратора</string>
+    <string name="QRCode_scanned">QR-код отсканирован</string>
+    <string name="QRCode_not_recognized">QR-код не распознан</string>
+    <string name="completed_registration">Вы успешно прошли регистрацию</string>
+    <string name="login_busy">Такой логин занят</string>
+    <string name="connection_error">Ошибка подключения</string>
+    <string name="invalid_authorization_data">Неверные данные авторизации</string>
+
+    <string name="free">Свободен</string>
+    <string name="busy">Занят</string>
+
+    <string name="request_failed">Не удалось выполнить запрос. Код ошибки:</string>
+    <string name="request_server_failed">Не удалось выполнить запрос на сервер.</string>
+
+    <string name="message_send">Сообщение отправлено!</string>
+    <string name="give_permission">Дайте разрешение выводить приложение поверх других окон!</string>
 </resources>
