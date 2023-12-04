@@ -1,6 +1,5 @@
-package com.example.courier.connect
+package com.example.courier.service
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,31 +7,31 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.os.Looper
-import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.VISIBILITY_SECRET
 import com.example.courier.R
+import com.example.courier.connect.Rabbit
+import com.example.courier.enums.RabbitCode
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LocationMy
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import java.util.concurrent.Executors
 
-class SendLocation() : LocationListener , Service() {
+class SendLocation : LocationListener , Service() {
 
 //    private val _context:Context = context
 
@@ -42,16 +41,20 @@ class SendLocation() : LocationListener , Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
-        val notification = createNotification()
-
-        // Вызов startForeground с соответствующими параметрами
-        startForeground(72018, notification)
 
         executor.submit {
           requestLocation(applicationContext)
         }
+
+        val notification = createNotification()
+
+        notification.visibility = Notification.VISIBILITY_SECRET
+
+        // Вызов startForeground с соответствующими параметрами
+        startForeground(72018, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+        //startForeground(72018, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
 //        val backgroundThread = Thread {
 //            requestLocation(applicationContext)
 //        }
@@ -59,7 +62,7 @@ class SendLocation() : LocationListener , Service() {
 
 
 
-        return START_STICKY
+        return START_REDELIVER_INTENT
     }
 
     override fun onDestroy() {
@@ -86,6 +89,7 @@ class SendLocation() : LocationListener , Service() {
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Курьер")
             .setSmallIcon(R.drawable.truck)
+            .setVisibility(VISIBILITY_SECRET)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         return notificationBuilder.build()
     }
@@ -139,14 +143,14 @@ class SendLocation() : LocationListener , Service() {
                                 val gson = Gson()
                                 val body = gson.toJson(LocationMy(latitude, longitude))
                                 val token = GetSettings(context).load("token")
-                                Log.d("courier_log", "SendLocation передал координаты в Rabbit для отправки")
-                                Rabbit(context).sendMessage(token, "location", body)
+                                Log.d("courier_log", "SendLocation передал координаты в Rabbit для отправки = $location")
+                                Rabbit(context).sendMessage(token, RabbitCode.LOCATION, body)
 
                                 // Закрытие соединения
                                 //fusedLocationClient.removeLocationUpdates(locationCallback)
                             } else {
                                 // Местоположение не доступно
-                                Log.e("courier_log", "SendLocation Местоположение не доступно")
+                                Log.e("courier_log", "SendLocation Местоположение не доступно локация = $location")
                                 Toast.makeText(context.applicationContext, "Включите геолокацию!", Toast.LENGTH_LONG).show()
                             }
                         }
@@ -204,6 +208,7 @@ class SendLocation() : LocationListener , Service() {
 
 
     }
+
 
     override fun onBind(intent: Intent?): IBinder? {
         TODO("Not yet implemented")

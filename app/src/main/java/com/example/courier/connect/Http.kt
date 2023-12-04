@@ -3,21 +3,24 @@ package com.example.courier.connect
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Build
 import android.util.Log
+import android.view.View
 import android.widget.Button
-import android.widget.Switch
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.activity.HomeActivity
+import com.example.courier.activity.RegistrActivity
+import com.example.courier.enums.RabbitCode
+import com.example.courier.enums.SettingsValue
 import com.example.courier.models.CreateDriver
 import com.example.courier.models.GetSettings
-import com.example.courier.models.GetSettings.Companion.TOKEN
 import com.example.courier.models.LoginDriver
 import com.example.courier.models.Message
 import com.google.gson.Gson
@@ -29,7 +32,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Modifier
-import java.util.Date
 
 @SuppressLint("SuspiciousIndentation")
 class Http(private var activity: AppCompatActivity) {
@@ -46,14 +48,11 @@ class Http(private var activity: AppCompatActivity) {
         .create()
 
     init {
-        do {
+        //do {
             var flag = false
-            if (MainActivity.connectionFlag) {
-                val server: String =
-                    GetSettings(activity).load(GetSettings.PROTOCOL) + "://"+
-                            GetSettings(activity).load(GetSettings.SERVER_NAME) + ":" +
-                            GetSettings(activity).load(GetSettings.SERVER_PORT)
-                Log.e("courier_log", "retrofit init $server")
+            //if (MainActivity.connectionFlag) {
+                val server: String =GetSettings(activity).getURI()
+                Log.d("courier_log", "retrofit init $server")
                 val retrofit = server.let {
                     Retrofit.Builder()
                         .baseUrl(it)
@@ -63,12 +62,12 @@ class Http(private var activity: AppCompatActivity) {
                 if (retrofit != null) {
                     this.api = retrofit.create(API::class.java)
                 }
-            } else {
-                Log.e("courier_log", "Http init disconnect")
-                Thread.sleep(5000)
-                flag = true
-            }
-        } while (flag)
+//            } else {
+//                Log.e("courier_log", "Http init disconnect")
+//                Thread.sleep(5000)
+//                flag = true
+//            }
+       // } while (flag)
     }
 
     fun registr(createDriver: CreateDriver) {
@@ -79,21 +78,9 @@ class Http(private var activity: AppCompatActivity) {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
 
-                    GetSettings(activity).save(TOKEN, response.body().toString())
-                    Thread(Runnable {
-                        Log.d("courier_log", "(MainActivity Перехожу в PingServer")
-                        PingServer(activity).connection()
-                    }).start()
-                    Rabbit(activity).startListening()
-                    Rabbit(activity).sendMessage(GetSettings(activity).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
-                    Thread(Runnable {
-                        SendLocation().requestLocation(activity)
-                    }).start()
-
-
-
-                    val intent = Intent(activity, HomeActivity::class.java)
-
+                    GetSettings(activity).save(SettingsValue.TOKEN.value, response.body().toString())
+                    Rabbit(activity).sendMessage(GetSettings(activity).load(SettingsValue.TOKEN.value),RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING,"")
+                    val intent = Intent(activity, MainActivity::class.java)
                     Toast.makeText(activity.applicationContext, "Вы успешно прошли регистрацию", Toast.LENGTH_LONG).show()
                     activity.startActivity(intent)
                 }
@@ -106,10 +93,16 @@ class Http(private var activity: AppCompatActivity) {
             override fun onFailure(call: Call<String>, throwable: Throwable) {
                 throwable.localizedMessage?.let { Log.e("httpConnect", it) }
                 Toast.makeText(activity, "Ошибка подключения", Toast.LENGTH_LONG).show()
-                val integrator = IntentIntegrator(activity)
-                integrator.setOrientationLocked(false)
-                integrator.setPrompt("Отсканируйте QR-код у администратора")
-                integrator.initiateScan()
+
+                val rootLayout = (activity as Activity).findViewById<ConstraintLayout>(R.id.registrActivity)
+                val childCount = rootLayout.childCount
+                for (i in 0 until childCount) {
+                    val child = rootLayout.getChildAt(i)
+                    child.visibility = View.VISIBLE
+
+                }
+                (activity as Activity).findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility =
+                    View.GONE
             }
         })
     }
@@ -121,9 +114,8 @@ class Http(private var activity: AppCompatActivity) {
             @SuppressLint("CutPasteId", "SetTextI18n", "SimpleDateFormat")
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.code() == 200) {
-                    GetSettings(activity).save(TOKEN, response.body().toString())
-                    Rabbit(activity).startListening()
-                    Rabbit(activity).sendMessage(GetSettings(activity).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
+                    GetSettings(activity).save(SettingsValue.TOKEN.value, response.body().toString())
+                    Rabbit(activity).sendMessage(GetSettings(activity).load(SettingsValue.TOKEN.value),RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING,"")
 //                    Thread(Runnable {
 //                        SendLocation(activity).requestLocation(activity)
 //                    }).start()
@@ -141,10 +133,16 @@ class Http(private var activity: AppCompatActivity) {
             override fun onFailure(call: Call<String>, throwable: Throwable) {
                 throwable.localizedMessage?.let { Log.e("httpConnect", it) }
                 Toast.makeText(activity, "Ошибка подключения", Toast.LENGTH_LONG).show()
-                val integrator = IntentIntegrator(activity)
-                integrator.setOrientationLocked(false)
-                integrator.setPrompt("Отсканируйте QR-код у администратора")
-                integrator.initiateScan()
+
+                val rootLayout = (activity as Activity).findViewById<ConstraintLayout>(R.id.loginLayout)
+                val childCount = rootLayout.childCount
+                for (i in 0 until childCount) {
+                    val child = rootLayout.getChildAt(i)
+                    child.visibility = View.VISIBLE
+                }
+
+                (activity as Activity).findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility =
+                    View.GONE
             }
         })
     }

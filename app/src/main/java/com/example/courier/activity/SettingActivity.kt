@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.connect.Rabbit
-import com.example.courier.connect.Rabbit.Companion.connection
+import com.example.courier.enums.RabbitCode
 import com.example.courier.models.GetSettings
 import com.google.zxing.integration.android.IntentIntegrator
 
@@ -31,9 +31,9 @@ class SettingActivity : AppCompatActivity() {
         }
         findViewById<TextView>(R.id.logout).setOnClickListener{
             val token = GetSettings(this).load("token")
-            Rabbit(this).sendMessage(token,"logout","ok")
+            Rabbit(this).sendMessage(token,RabbitCode.LOGOUT,"ok")
             GetSettings(this).remove("token")
-            connection = null;
+           // connection = null;
             startActivity(Intent(this,MainActivity::class.java))
         }
     }

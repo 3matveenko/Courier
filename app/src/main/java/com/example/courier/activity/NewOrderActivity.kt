@@ -1,8 +1,13 @@
 package com.example.courier.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -18,19 +23,34 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
 import com.example.courier.models.GetSettings
 import com.example.courier.connect.Rabbit
+import com.example.courier.enums.RabbitCode
 
 class NewOrderActivity : AppCompatActivity() {
+
+
+    private val channelId = "my_channel"
+    private val notificationId = 1
+
+//    init {
+//        createNotificationChannel()
+//    }
 
     @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_order)
+
+
+
         Log.d("courier_log", "(NewOrderActivity открылся активити")
         val mediaPlayer = MediaPlayer.create(applicationContext, R.raw.new_order)
         val vibrator: Vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -75,10 +95,10 @@ class NewOrderActivity : AppCompatActivity() {
             val token = GetSettings(this).load("token")
             if(reject == null){
                 Log.d("courier_log", "(NewOrderActivity отправил accept_order:ok")
-                Rabbit(this).sendMessage(token,"accept_order","ok")
+                Rabbit(this).sendMessage(token,RabbitCode.ACCEPT_ORDER,"ok")
             } else {
                 Log.d("courier_log", "(NewOrderActivity отправил accept_rejected_order:ok")
-                Rabbit(this).sendMessage(token,"accept_rejected_order","ok")
+                Rabbit(this).sendMessage(token,RabbitCode.ACCEPT_REJECT_ORDER,"ok")
             }
             vibrator.cancel()
             mediaPlayer.release()
@@ -107,6 +127,51 @@ class NewOrderActivity : AppCompatActivity() {
             mediaPlayer.release()
             startActivity(Intent(this@NewOrderActivity, HomeActivity::class.java))
             finish()
+        }
+
+    }
+
+//    private fun createNotificationChannel() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val name = "My Channel"
+//            val descriptionText = "Description of my channel"
+//            val importance = NotificationManager.IMPORTANCE_DEFAULT
+//            val channel = NotificationChannel(channelId, name, importance).apply {
+//                description = descriptionText
+//            }
+//
+//            val notificationManager =
+//                applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//    }
+
+    fun showNotification(title: String, content: String) {
+        val intent = Intent(applicationContext, NewOrderActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent: PendingIntent =
+            PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        val builder = NotificationCompat.Builder(applicationContext, channelId)
+            .setSmallIcon(R.drawable.truck)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        with(NotificationManagerCompat.from(applicationContext)) {
+            if (ActivityCompat.checkSelfPermission(
+                    applicationContext,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                return
+            }
+            notify(notificationId, builder.build())
         }
     }
 }

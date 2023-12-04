@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.connect.Rabbit
+import com.example.courier.enums.RabbitCode
+import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
 import com.example.courier.models.Order
 import com.example.courier.models.SendSms
@@ -42,7 +44,7 @@ class DetailsActivity : AppCompatActivity() {
         val checkedButton = findViewById<Button>(R.id.checkButton)
         val rejectedTextView = findViewById<TextView>(R.id.rejectedView)
         val comment = findViewById<TextView>(R.id.comment)
-        val token = GetSettings(this).load(GetSettings.TOKEN)
+        val token = GetSettings(this).load(SettingsValue.TOKEN.value)
 
         val orderString:String = intent.getStringExtra("order").toString()
         val gson = GsonBuilder()
@@ -76,7 +78,7 @@ class DetailsActivity : AppCompatActivity() {
             finish()
         }
         rejectButton.setOnClickListener {
-            if(MainActivity.connectionFlag){
+   //         if(MainActivity.connectionFlag){
                 val dialogView = layoutInflater.inflate(R.layout.reject_order_alert, null)
                 val dialog = AlertDialog.Builder(this)
                     .setView(dialogView)
@@ -88,7 +90,7 @@ class DetailsActivity : AppCompatActivity() {
                 dialogView.findViewById<Button>(R.id.button_send_comment_reject_order).setOnClickListener {
                     val comment = dialogView.findViewById<EditText>(R.id.commentRejectEditText)
                     if(comment.text.toString() != ""){
-                        Rabbit(this).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"reject_order",comment.text.toString())
+                        Rabbit(this).sendMessage(GetSettings(this).load(SettingsValue.TOKEN.value),RabbitCode.REJECT_ORDER,comment.text.toString())
                         dialog.dismiss()
                         startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
                         finish()
@@ -97,12 +99,12 @@ class DetailsActivity : AppCompatActivity() {
                     }
                 }
                 dialog.show()
-            } else {
-                Toast.makeText(this,"Нет интернета!",Toast.LENGTH_SHORT).show()
-            }
+//            } else {
+//                Toast.makeText(this,"Нет интернета!",Toast.LENGTH_SHORT).show()
+//            }
         }
         sendSmsButton.setOnClickListener {
-            if(MainActivity.connectionFlag){
+//            if(MainActivity.connectionFlag){
             val dialogView = layoutInflater.inflate(R.layout.send_sms_alert, null)
 
             val dialog = AlertDialog.Builder(this)
@@ -124,20 +126,20 @@ class DetailsActivity : AppCompatActivity() {
                 editCode.visibility = View.VISIBLE
                 checkedButton.visibility = View.VISIBLE
                 //Toast.makeText(this, "Cообщение отправлено! $randomNumber",Toast.LENGTH_LONG).show()
-                Rabbit(this).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"send_sms",gson.toJson(SendSms(order.phone,randomNumber)))
+                Rabbit(this).sendMessage(GetSettings(this).load(SettingsValue.TOKEN.value),RabbitCode.SEND_SMS,gson.toJson(SendSms(order.phone,randomNumber)))
                 dialog.dismiss()
             }
                 dialogView.findViewById<Button>(R.id.close_no_sms).setOnClickListener {
                     GetSettings(this).remove("id_"+order.id)
                     Toast.makeText(this,"Заказ доставлен без подтверждения",Toast.LENGTH_LONG).show()
-                    Rabbit(this).sendMessage(token,"order_success_not_sold",order.id.toString())
+                    Rabbit(this).sendMessage(token,RabbitCode.ORDER_SUCCESS_NOT_SOLD,order.id.toString())
                     startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
                     finish()
                 }
             dialog.show()
-            } else {
-                Toast.makeText(this,"Нет интернета!",Toast.LENGTH_SHORT).show()
-            }
+//            } else {
+//                Toast.makeText(this,"Нет интернета!",Toast.LENGTH_SHORT).show()
+//            }
         }
 
         checkedButton.setOnClickListener {
@@ -147,7 +149,7 @@ class DetailsActivity : AppCompatActivity() {
                 if(GetSettings(this).load("id_"+order.id)==editCode.text.toString()){
                     GetSettings(this).remove("id_"+order.id)
                     Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
-                    Rabbit(this).sendMessage(token,"order_success",order.id.toString())
+                    Rabbit(this).sendMessage(token,RabbitCode.ORDER_SUCCESS,order.id.toString())
                     startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
                     finish()
                 } else {

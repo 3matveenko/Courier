@@ -14,10 +14,8 @@ import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.ProgressBar
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -28,6 +26,8 @@ import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.connect.Http
 import com.example.courier.connect.Rabbit
+import com.example.courier.enums.RabbitCode
+import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
 import com.example.courier.models.Message
 import com.example.courier.models.Order
@@ -122,7 +122,7 @@ class HomeActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     @SuppressLint("ResourceAsColor", "CutPasteId", "UseSwitchCompatOrMaterialCode",
-        "MissingInflatedId"
+        "MissingInflatedId", "SuspiciousIndentation"
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("courier_log", "(HomeActivity)  onCreate")
@@ -133,34 +133,28 @@ class HomeActivity : AppCompatActivity() {
         val networkInfo: NetworkInfo? = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
         if(networkInfo?.isConnected == true){
             Toast.makeText(this,"Отключите Wi-Fi!",Toast.LENGTH_LONG).show()
-            //finish()
         }
         setContentView(R.layout.activity_home)
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         val switch = findViewById<Button>(R.id.switchView)
         val goToSetting = findViewById<Button>(R.id.go_to_settings)
         goToSetting.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)
+
+            stringOrders.clear()
+            ll.adapter =
+                ArrayAdapter(_context, android.R.layout.simple_list_item_1, stringOrders)
+
             startActivity(intent)
         }
 
-        if(!MainActivity.connectionFlag){
-            switch.text = "Нет интернета"
-        }
-
-
         val token:String = GetSettings(this).load("token")
 
-        Thread(Runnable {
             Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),false)
             Log.d("courier_log", "запросил статус")
-        }).start()
 
         switch.setOnClickListener {
             Log.e("courier_log",Thread.activeCount().toString())
-            Thread(Runnable {
             Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),true)
-            }).start()
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(
             broadcastReceiver, IntentFilter(MESSAGE)
@@ -185,11 +179,24 @@ class HomeActivity : AppCompatActivity() {
             val jsonOrder:String = gson.toJson(orders?.get(position))
             val intent = Intent(this, DetailsActivity::class.java)
             intent.putExtra("order", jsonOrder)
+            stringOrders.clear()
+            ll.adapter =
+                ArrayAdapter(_context, android.R.layout.simple_list_item_1, stringOrders)
             startActivity(intent)
         }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-        Rabbit(applicationContext).sendMessage(GetSettings(this).load(GetSettings.TOKEN),"get_my_orders_status_progressing","")
+        Rabbit(applicationContext).sendMessage(GetSettings(this).load(SettingsValue.TOKEN.value),RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING,"")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("courier_log", "запросил заказы")
+
+        val token:String = GetSettings(this).load("token")
+        Rabbit(applicationContext).sendMessage(GetSettings(this).load(SettingsValue.TOKEN.value),RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING,"")
+        Http(this@HomeActivity).statusDay(Message(token, "", 0),false)
+        Log.d("courier_log", "запросил статус")
     }
 
     private val onBackPressedCallback: OnBackPressedCallback =
