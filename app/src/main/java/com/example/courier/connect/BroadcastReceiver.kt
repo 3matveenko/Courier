@@ -8,7 +8,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.activity.HomeActivity
 import com.example.courier.activity.NewOrderActivity
 
-class MyBroadcastReceiver: BroadcastReceiver() {
+class MyBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null) {
             if (intent?.action == "no_connection") {
@@ -19,14 +19,14 @@ class MyBroadcastReceiver: BroadcastReceiver() {
                 val newOrderIntent = Intent(context, NewOrderActivity::class.java)
                 val message = intent.getStringExtra("body")
                 val reject = intent.getStringExtra("reject")
-                if(reject=="true"){
+                if (reject == "true") {
                     newOrderIntent.putExtra("reject", "true")
                 }
                 newOrderIntent.putExtra("body", message)
                 newOrderIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(newOrderIntent)
             }
-            if(intent?.action=="my_orders"){
+            if (intent?.action == "my_orders") {
                 val message = intent.getStringExtra("body")
                 val intentMESSAGE = Intent(HomeActivity.MESSAGE)
                 intentMESSAGE.putExtra("body", message)

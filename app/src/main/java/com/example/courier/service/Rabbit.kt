@@ -1,10 +1,9 @@
-package com.example.courier.connect
+package com.example.courier.service
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import com.example.courier.enums.RabbitCode
-import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
 import com.example.courier.models.GetSettings.Companion.settings
 import com.example.courier.models.Message
@@ -31,9 +30,12 @@ class Rabbit(private var context: Context) {
     @SuppressLint("SuspiciousIndentation")
     fun sendMessage(token: String, code: RabbitCode, body: String = "") {
         Log.d("courier_log", "(Rabbit sendMessage")
+
         Thread {
+
             while (true) {
                 try {
+                    val connection = factory.newConnection()
                     val message =
                         GetSettings.gson.toJson(
                             Message(
@@ -43,8 +45,6 @@ class Rabbit(private var context: Context) {
                                 body
                             )
                         ).toByteArray()
-
-                    val connection = factory.newConnection()
 
                     val channel = connection.createChannel()
 
@@ -58,10 +58,10 @@ class Rabbit(private var context: Context) {
                     Log.d("courier_log", "Rabbit дошел до последнего брэйк")
                     break
                 } catch (e: InterruptedException) {
-                    Log.e("courier_log", "RabbitSendMessage первый кеч ${e}")
+                    Log.e("courier_log", "RabbitSendMessage первый кеч ${e.message}")
                     break
                 } catch (e: Exception) {
-                    Log.e("courier_log", "RabbitSendMessage второй кеч ${e}")
+                    Log.e("courier_log", "RabbitSendMessage второй кеч ${e.message}")
                     Thread.sleep(5000)
                 }
             }

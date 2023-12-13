@@ -13,9 +13,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.courier.MainActivity
 import com.example.courier.R
-import com.example.courier.connect.Rabbit
+import com.example.courier.service.Rabbit
 import com.example.courier.enums.RabbitCode
 import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
@@ -46,7 +45,7 @@ class DetailsActivity : AppCompatActivity() {
         val comment = findViewById<TextView>(R.id.comment)
         val token = GetSettings(this).load(SettingsValue.TOKEN.value)
 
-        val orderString:String = intent.getStringExtra("order").toString()
+        val orderString: String = intent.getStringExtra("order").toString()
         val gson = GsonBuilder()
             .setDateFormat("hh:mm")
             .excludeFieldsWithModifiers(
@@ -55,9 +54,9 @@ class DetailsActivity : AppCompatActivity() {
                 Modifier.VOLATILE
             )
             .create()
-        val order: Order = gson.fromJson(orderString,Order::class.java)
-        if(order.rejectOrder!=null){
-            rejectedTextView.text = "Заказ от "+order.rejectOrder.driver.name
+        val order: Order = gson.fromJson(orderString, Order::class.java)
+        if (order.rejectOrder != null) {
+            rejectedTextView.text = "Заказ от " + order.rejectOrder.driver.name
         } else {
             rejectedTextView.visibility = View.GONE
         }
@@ -68,7 +67,7 @@ class DetailsActivity : AppCompatActivity() {
         time.text = SimpleDateFormat("HH:mm").format(order.dateStart)
         comment.text = order.comment
 
-        if(GetSettings(this).isNull("id_"+order.id)){
+        if (GetSettings(this).isNull("id_" + order.id)) {
             editCode.visibility = View.GONE
             checkedButton.visibility = View.GONE
         }
@@ -78,33 +77,34 @@ class DetailsActivity : AppCompatActivity() {
             finish()
         }
         rejectButton.setOnClickListener {
-   //         if(MainActivity.connectionFlag){
-                val dialogView = layoutInflater.inflate(R.layout.reject_order_alert, null)
-                val dialog = AlertDialog.Builder(this)
-                    .setView(dialogView)
-                    .create()
+            val dialogView = layoutInflater.inflate(R.layout.reject_order_alert, null)
+            val dialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
 
-                dialogView.findViewById<Button>(R.id.button_close_alert_reject_order).setOnClickListener {
+            dialogView.findViewById<Button>(R.id.button_close_alert_reject_order)
+                .setOnClickListener {
                     dialog.dismiss()
                 }
-                dialogView.findViewById<Button>(R.id.button_send_comment_reject_order).setOnClickListener {
+            dialogView.findViewById<Button>(R.id.button_send_comment_reject_order)
+                .setOnClickListener {
                     val comment = dialogView.findViewById<EditText>(R.id.commentRejectEditText)
-                    if(comment.text.toString() != ""){
-                        Rabbit(this).sendMessage(GetSettings(this).load(SettingsValue.TOKEN.value),RabbitCode.REJECT_ORDER,comment.text.toString())
+                    if (comment.text.toString() != "") {
+                        Rabbit(this).sendMessage(
+                            GetSettings(this).load(SettingsValue.TOKEN.value),
+                            RabbitCode.REJECT_ORDER,
+                            comment.text.toString()
+                        )
                         dialog.dismiss()
                         startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
                         finish()
                     } else {
-                        Toast.makeText(this, "Добавьте причину отказа!",Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Добавьте причину отказа!", Toast.LENGTH_LONG).show()
                     }
                 }
-                dialog.show()
-//            } else {
-//                Toast.makeText(this,"Нет интернета!",Toast.LENGTH_SHORT).show()
-//            }
+            dialog.show()
         }
         sendSmsButton.setOnClickListener {
-//            if(MainActivity.connectionFlag){
             val dialogView = layoutInflater.inflate(R.layout.send_sms_alert, null)
 
             val dialog = AlertDialog.Builder(this)
@@ -115,57 +115,61 @@ class DetailsActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             dialogView.findViewById<Button>(R.id.alert_sms_yes).setOnClickListener {
-                val randomNumber:String
-                if(GetSettings(this).isNull("id_"+order.id)){
+                val randomNumber: String
+                if (GetSettings(this).isNull("id_" + order.id)) {
                     val random = java.util.Random()
                     randomNumber = String.format("%04d", random.nextInt(10000))
-                    GetSettings(this).save("id_"+order.id,randomNumber)
+                    GetSettings(this).save("id_" + order.id, randomNumber)
                 } else {
-                    randomNumber = GetSettings(this).load("id_"+order.id)
+                    randomNumber = GetSettings(this).load("id_" + order.id)
                 }
                 editCode.visibility = View.VISIBLE
                 checkedButton.visibility = View.VISIBLE
-                //Toast.makeText(this, "Cообщение отправлено! $randomNumber",Toast.LENGTH_LONG).show()
-                Rabbit(this).sendMessage(GetSettings(this).load(SettingsValue.TOKEN.value),RabbitCode.SEND_SMS,gson.toJson(SendSms(order.phone,randomNumber)))
+                Rabbit(this).sendMessage(
+                    GetSettings(this).load(SettingsValue.TOKEN.value),
+                    RabbitCode.SEND_SMS,
+                    gson.toJson(SendSms(order.phone, randomNumber))
+                )
                 dialog.dismiss()
             }
-                dialogView.findViewById<Button>(R.id.close_no_sms).setOnClickListener {
-                    GetSettings(this).remove("id_"+order.id)
-                    Toast.makeText(this,"Заказ доставлен без подтверждения",Toast.LENGTH_LONG).show()
-                    Rabbit(this).sendMessage(token,RabbitCode.ORDER_SUCCESS_NOT_SOLD,order.id.toString())
-                    startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
-                    finish()
-                }
+            dialogView.findViewById<Button>(R.id.close_no_sms).setOnClickListener {
+                GetSettings(this).remove("id_" + order.id)
+                Toast.makeText(this, "Заказ доставлен без подтверждения", Toast.LENGTH_LONG).show()
+                Rabbit(this).sendMessage(
+                    token,
+                    RabbitCode.ORDER_SUCCESS_NOT_SOLD,
+                    order.id.toString()
+                )
+                startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
+                finish()
+            }
             dialog.show()
-//            } else {
-//                Toast.makeText(this,"Нет интернета!",Toast.LENGTH_SHORT).show()
-//            }
         }
 
         checkedButton.setOnClickListener {
             editCode = findViewById(R.id.editCode)
 
 
-                if(GetSettings(this).load("id_"+order.id)==editCode.text.toString()){
-                    GetSettings(this).remove("id_"+order.id)
-                    Toast.makeText(this,"Заказ успешно доставлен",Toast.LENGTH_LONG).show()
-                    Rabbit(this).sendMessage(token,RabbitCode.ORDER_SUCCESS,order.id.toString())
-                    startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
-                    finish()
-                } else {
-                    Toast.makeText(this,"Код введен не верно!",Toast.LENGTH_LONG).show()
-                    editCode.text.clear()
-                }
+            if (GetSettings(this).load("id_" + order.id) == editCode.text.toString()) {
+                GetSettings(this).remove("id_" + order.id)
+                Toast.makeText(this, "Заказ успешно доставлен", Toast.LENGTH_LONG).show()
+                Rabbit(this).sendMessage(token, RabbitCode.ORDER_SUCCESS, order.id.toString())
+                startActivity(Intent(this@DetailsActivity, HomeActivity::class.java))
+                finish()
+            } else {
+                Toast.makeText(this, "Код введен не верно!", Toast.LENGTH_LONG).show()
+                editCode.text.clear()
+            }
         }
 
-        phoneNumber.setOnClickListener{
+        phoneNumber.setOnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("", order.phone)
             clipboard.setPrimaryClip(clip)
             Toast.makeText(this, "Скопировано", Toast.LENGTH_SHORT).show()
         }
 
-        address.setOnClickListener{
+        address.setOnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("", order.address)
             clipboard.setPrimaryClip(clip)
@@ -174,7 +178,10 @@ class DetailsActivity : AppCompatActivity() {
 
         address.setOnLongClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("", order.latitude.toString()+","+order.longitude.toString())
+            val clip = ClipData.newPlainText(
+                "",
+                order.latitude.toString() + "," + order.longitude.toString()
+            )
             clipboard.setPrimaryClip(clip)
             Toast.makeText(this, "Скопированы координаты", Toast.LENGTH_SHORT).show()
             true

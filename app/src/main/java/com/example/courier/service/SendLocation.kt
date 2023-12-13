@@ -22,7 +22,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.VISIBILITY_SECRET
 import com.example.courier.R
-import com.example.courier.connect.Rabbit
 import com.example.courier.enums.RabbitCode
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LocationMy

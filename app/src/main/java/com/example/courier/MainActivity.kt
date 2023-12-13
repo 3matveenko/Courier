@@ -1,5 +1,6 @@
 package com.example.courier
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
@@ -27,25 +28,18 @@ import com.example.courier.activity.HomeActivity
 import com.example.courier.activity.RegistrActivity
 import com.example.courier.connect.Http
 import com.example.courier.connect.MyBroadcastReceiver
-import com.example.courier.service.SendLocation
 import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
 import com.example.courier.models.LoginDriver
 import com.example.courier.models.Setting
 import com.example.courier.models.isNotNull
 import com.example.courier.service.RabbitService
+import com.example.courier.service.SendLocation
 import com.google.gson.Gson
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 
-import android.Manifest
-
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-       // var connectionFlag: Boolean = false
-        const val LOG_TAG: String = "COURIER_LOG"
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId", "InvalidWakeLockTag")
@@ -54,8 +48,31 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.login)
 
-        ((applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock"))
-        .acquire(1200*60*1000L)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.FOREGROUND_SERVICE,
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ),
+                123
+            )
+        }
+
+
+        ((applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager).newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "MyWakeLock"
+        ))
+            .acquire(1200 * 60 * 1000L)
 
         Log.d("courier_log", "MainActivity ***START app Courier***")
         if (GetSettings(this).isNull(SettingsValue.SERVER_NAME.value)) {
@@ -63,17 +80,18 @@ class MainActivity : AppCompatActivity() {
             val serviceRabbit = Intent(this, RabbitService::class.java)
             val serviceIntent = Intent(this, SendLocation::class.java)
 
-            if (!isServiceRunning(RabbitService::class.java)){
-                    startForegroundService(serviceRabbit)
-                }
+            if (!isServiceRunning(RabbitService::class.java)) {
+                startForegroundService(serviceRabbit)
+            }
 
-               if(!isServiceRunning(SendLocation::class.java)){
+            if (!isServiceRunning(SendLocation::class.java)) {
                 startForegroundService(serviceIntent)
 
             }
 
         } else {
-            Toast.makeText(this,"Отсканируйте настройки у администратора!",Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Отсканируйте настройки у администратора!", Toast.LENGTH_LONG)
+                .show()
             Log.e("courier_log", "MainActivity SERVER_NAME не обнаружен")
             startQr()
         }
@@ -91,20 +109,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.FOREGROUND_SERVICE,
-                    Manifest.permission.POST_NOTIFICATIONS,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ),
-                123
-            )
-        }
 
         broadcastIni()
 
@@ -125,31 +129,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.but_enter).setOnClickListener {
-                if (GetSettings(this).isNull(SettingsValue.SERVER_NAME.value)) {
-                    val login = findViewById<EditText>(R.id.editEmail).text.toString()
-                    val password = findViewById<EditText>(R.id.editPassword).text.toString()
-                    if (login.isEmpty() || password.isEmpty()) {
-                        Toast.makeText(this, "Поле должно быть заполнено", Toast.LENGTH_SHORT)
-                            .show()
-                    } else {
-                        val rootLayout = findViewById<ConstraintLayout>(R.id.loginLayout)
-                        val childCount = rootLayout.childCount
-                        for (i in 0 until childCount) {
-                            val child = rootLayout.getChildAt(i)
-                            child.visibility = View.GONE
-                        }
-
-                        findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility =
-                            View.VISIBLE
-                        Http(this).login(LoginDriver(login, password))
-                    }
+            if (GetSettings(this).isNull(SettingsValue.SERVER_NAME.value)) {
+                val login = findViewById<EditText>(R.id.editEmail).text.toString()
+                val password = findViewById<EditText>(R.id.editPassword).text.toString()
+                if (login.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(this, "Поле должно быть заполнено", Toast.LENGTH_SHORT)
+                        .show()
                 } else {
-                    Toast.makeText(
-                        this,
-                        "отсканируйте QR код у администратора!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val rootLayout = findViewById<ConstraintLayout>(R.id.loginLayout)
+                    val childCount = rootLayout.childCount
+                    for (i in 0 until childCount) {
+                        val child = rootLayout.getChildAt(i)
+                        child.visibility = View.GONE
+                    }
+
+                    findViewById<ProgressBar>(R.id.progressBarHomeActivity).visibility =
+                        View.VISIBLE
+                    Http(this).login(LoginDriver(login, password))
                 }
+            } else {
+                Toast.makeText(
+                    this,
+                    "отсканируйте QR код у администратора!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -165,6 +169,10 @@ class MainActivity : AppCompatActivity() {
         val intentFilter3 = IntentFilter("my_orders")
         val receiver3 = MyBroadcastReceiver()
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver3, intentFilter3)
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            HomeActivity.broadcastReceiver, IntentFilter(HomeActivity.MESSAGE)
+        )
     }
 
     private fun startQr() {
@@ -187,12 +195,18 @@ class MainActivity : AppCompatActivity() {
                     val gson = Gson()
                     val setting: Setting = gson.fromJson(result.contents, Setting::class.java)
                     if (isNotNull(setting)) {
-                        GetSettings(applicationContext).save(SettingsValue.PROTOCOL.value, setting.protocol)
+                        GetSettings(applicationContext).save(
+                            SettingsValue.PROTOCOL.value,
+                            setting.protocol
+                        )
                         GetSettings(applicationContext).save(
                             SettingsValue.BACK_QUEUE_NAME.value,
                             setting.backQueueName
                         )
-                        GetSettings(applicationContext).save(SettingsValue.SERVER_NAME.value, setting.serverName)
+                        GetSettings(applicationContext).save(
+                            SettingsValue.SERVER_NAME.value,
+                            setting.serverName
+                        )
                         GetSettings(applicationContext).save(
                             SettingsValue.SERVER_PORT.value,
                             setting.serverPort

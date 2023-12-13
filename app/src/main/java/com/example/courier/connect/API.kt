@@ -15,15 +15,15 @@ interface API {
         const val TOKEN: String = "gYIABBFGDkyCwg"
     }
 
-    @Headers("Content-Type: application/json;charset=UTF-8","Authorization: $TOKEN")
+    @Headers("Content-Type: application/json;charset=UTF-8", "Authorization: $TOKEN")
     @POST("/app/create")
     fun createAccount(@Body query: CreateDriver): Call<String>
 
-    @Headers("Content-Type: application/json;charset=UTF-8","Authorization: $TOKEN")
+    @Headers("Content-Type: application/json;charset=UTF-8", "Authorization: $TOKEN")
     @POST("/app/authorization")
     fun login(@Body query: LoginDriver): Call<String>
 
-    @Headers("Content-Type: application/json;charset=UTF-8","Authorization: $TOKEN")
+    @Headers("Content-Type: application/json;charset=UTF-8", "Authorization: $TOKEN")
     @POST("/app/status_day")
     fun statusDay(@Header("Flag") flag: Boolean, @Body query: Message): Call<String>
 

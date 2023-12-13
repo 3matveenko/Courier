@@ -16,7 +16,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.courier.R
-import com.example.courier.connect.Rabbit
 import com.example.courier.enums.IntentExtra
 import com.example.courier.enums.RabbitCode
 import com.example.courier.models.GetSettings
@@ -29,6 +28,7 @@ import java.util.concurrent.Executors
 
 class RabbitService : Service() {
 
+    var count:Int = 0
     private val executor = Executors.newSingleThreadExecutor()
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -69,92 +69,101 @@ class RabbitService : Service() {
 
 
     private fun startListening(){
+        count++
 
-        Log.d("courier_log", "RabbitListener запустил поток")
+        Log.d("courier_log", "RabbitListener запустил поток ${GetSettings.settings.toString()} count = $count")
         GetSettings(this)
-
-
-
-        //Thread {
-            val channel: Channel = Rabbit.factory.newConnection()!!.createChannel()
+        val channel: Channel = Rabbit.factory.newConnection()!!.createChannel()
+        if(channel.isOpen){
             channel.queueDeclare(GetSettings.settings.token, true, false, false, null)
+            val consumer = object : DefaultConsumer(channel) {
+                override fun handleDelivery(
+                    consumerTag: String?,
+                    envelope: Envelope?,
+                    properties: AMQP.BasicProperties?,
+                    body: ByteArray?
+                ) {
+                    // Log.d("courier_log", "RabbitListener перед message")
+                    val message =
+                        GetSettings.gson.fromJson(
+                            String(body!!, Charsets.UTF_8),
+                            Message::class.java
+                        )
+                    Log.d("courier_log", "RabbitListener получил сообщение ${message.body}")
+                    when (message.code) {
+                        RabbitCode.NEW_ORDER_REJECTED.value -> {
+                            if ((message.millisecondsSinceEpoch + 60000) >= System.currentTimeMillis()) {
+                                val intent = Intent(Action.OPEN_NEW_ORDER.value)
 
-            while (true) {
-                try {
-                    //Log.d("courier_log", "RabbitListener после try")
-                    val consumer = object : DefaultConsumer(channel) {
-                        override fun handleDelivery(
-                            consumerTag: String?,
-                            envelope: Envelope?,
-                            properties: AMQP.BasicProperties?,
-                            body: ByteArray?
-                        ) {
-                           // Log.d("courier_log", "RabbitListener перед message")
-                            val message =
-                                GetSettings.gson.fromJson(
-                                    String(body!!, Charsets.UTF_8),
-                                    Message::class.java
-                                )
-                            Log.d("courier_log", "RabbitListener получил сообщение ${message.body}")
-                            when (message.code) {
-                                RabbitCode.NEW_ORDER_REJECTED.value -> {
-                                    if ((message.millisecondsSinceEpoch + 60000) >= System.currentTimeMillis()) {
-                                        val intent = Intent(Action.OPEN_NEW_ORDER.value)
+                                intent.putExtra(IntentExtra.REJECT.value, true)
+                                intent.putExtra(IntentExtra.BODY.value, message.body)
 
-                                        intent.putExtra(IntentExtra.REJECT.value, true)
-                                        intent.putExtra(IntentExtra.BODY.value, message.body)
-
-                                        LocalBroadcastManager
-                                            .getInstance(applicationContext)
-                                            .sendBroadcast(intent)
-                                    }
-                                }
-
-                                RabbitCode.NEW_ORDER.value -> {
-                                    if ((message.millisecondsSinceEpoch + 60000) >= System.currentTimeMillis()) {
-                                        Log.d("courier_log", "RabbitListener получил сообщение $applicationContext")
-                                        LocalBroadcastManager
-                                            .getInstance(applicationContext)
-                                            .sendBroadcast(
-                                                Intent(Action.OPEN_NEW_ORDER.value).putExtra(
-                                                    IntentExtra.BODY.value,
-                                                    message.body
-                                                )
-                                            )
-                                    }
-                                }
-
-                                RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING.value -> {
-                                    LocalBroadcastManager
-                                        .getInstance(applicationContext)
-                                        .sendBroadcast(
-                                            Intent(Action.MY_ORDER.value).putExtra(
-                                                IntentExtra.BODY.value,
-                                                message.body
-                                            )
-                                        )
-                                }
-
-                                RabbitCode.SEND_SMS_STATUS.value -> {
-                                    Toast.makeText(
-                                        applicationContext,
-                                        applicationContext.getString(R.string.message_send),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
+                                LocalBroadcastManager
+                                    .getInstance(applicationContext)
+                                    .sendBroadcast(intent)
                             }
                         }
+
+                        RabbitCode.NEW_ORDER.value -> {
+                            if ((message.millisecondsSinceEpoch + 60000) >= System.currentTimeMillis()) {
+                                Log.d("courier_log", "RabbitListener получил сообщение $applicationContext")
+                                LocalBroadcastManager
+                                    .getInstance(applicationContext)
+                                    .sendBroadcast(
+                                        Intent(Action.OPEN_NEW_ORDER.value).putExtra(
+                                            IntentExtra.BODY.value,
+                                            message.body
+                                        )
+                                    )
+                            }
+                        }
+
+                        RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING.value -> {
+                            LocalBroadcastManager
+                                .getInstance(applicationContext)
+                                .sendBroadcast(
+                                    Intent(Action.MY_ORDER.value).putExtra(
+                                        IntentExtra.BODY.value,
+                                        message.body
+                                    )
+                                )
+                        }
+
+                        RabbitCode.SEND_SMS_STATUS.value -> {
+                            Toast.makeText(
+                                applicationContext,
+                                applicationContext.getString(R.string.message_send),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
-                    Log.d("courier_log", "RabbitListener basicConsume")
-                    channel.basicConsume(GetSettings.settings.token, true, consumer)
-                } catch (e: InterruptedException) {
-                    Log.e("courier_log", "RabbitListener первый кеч - ${e.message}")
-                    break
-                } catch (e: Exception) {
-                    Log.e("courier_log", "RabbitListener второй кеч - ${e.message}")
-                    Thread.sleep(5000)
                 }
             }
+
+            try {
+                channel.basicConsume(GetSettings.settings.token, true, consumer)
+                Log.d("courier_log", "RabbitListener создал консюмера")
+
+
+                channel.addShutdownListener { cause ->
+                    if(!channel.isOpen) {
+                        Log.e("courier_log", "RabbitListener close")
+                        Thread.sleep(5000)
+                        startListening()
+                    }
+                }
+                Log.e("courier_log", "RabbitListener close")
+            } catch (e: InterruptedException) {
+                Log.e("courier_log", "RabbitListener первый кеч - ${e.message}")
+            } catch (e: Exception) {
+                Log.e("courier_log", "RabbitListener второй кеч - ${e.message}")
+                Thread.sleep(5000)
+            }
+        } else {
+            Thread.sleep(5000)
+            startListening()
+        }
+
        // }.start()
     }
 

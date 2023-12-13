@@ -22,10 +22,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.example.courier.MainActivity
 import com.example.courier.R
 import com.example.courier.connect.Http
-import com.example.courier.connect.Rabbit
+import com.example.courier.service.Rabbit
 import com.example.courier.enums.RabbitCode
 import com.example.courier.enums.SettingsValue
 import com.example.courier.models.GetSettings
@@ -44,13 +43,13 @@ class HomeActivity : AppCompatActivity() {
     companion object {
 
         @SuppressLint("StaticFieldLeak")
-        lateinit var ll:ListView
+        lateinit var ll: ListView
 
         @SuppressLint("StaticFieldLeak")
-        lateinit var textViewNoOrders:TextView
+        lateinit var textViewNoOrders: TextView
 
         @SuppressLint("StaticFieldLeak")
-        lateinit var progressBar:ProgressBar
+        lateinit var progressBar: ProgressBar
 
         @SuppressLint("StaticFieldLeak")
         lateinit var _context: Context
@@ -95,21 +94,24 @@ class HomeActivity : AppCompatActivity() {
                     progressBar.visibility = View.GONE
                     orders?.forEach {
                         if (it != null) {
-                            if(it.rejectOrder==null){
+                            if (it.rejectOrder == null) {
                                 stringOrders.add(it.address)
                             } else {
-                                stringOrders.add(it.address+" Перенаправленный заказ!")
+                                stringOrders.add(it.address + " Перенаправленный заказ!")
                             }
 
                         }
                     }
-                } else{
+                } else {
                     ll.visibility = View.GONE
                     textViewNoOrders.visibility = View.VISIBLE
                     progressBar.visibility = View.GONE
                 }
                 val countOrders = orders?.size
-                Log.d("courier_log", "перезаписал адаптер(HomeActivity), в массеве $countOrders элементов")
+                Log.d(
+                    "courier_log",
+                    "перезаписал адаптер(HomeActivity), в массеве $countOrders элементов"
+                )
                 if (::ll.isInitialized) {
                     ll.adapter =
                         ArrayAdapter(_context, android.R.layout.simple_list_item_1, stringOrders)
@@ -119,9 +121,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-
     @RequiresApi(Build.VERSION_CODES.M)
-    @SuppressLint("ResourceAsColor", "CutPasteId", "UseSwitchCompatOrMaterialCode",
+    @SuppressLint(
+        "ResourceAsColor", "CutPasteId", "UseSwitchCompatOrMaterialCode",
         "MissingInflatedId", "SuspiciousIndentation"
     )
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,8 +133,8 @@ class HomeActivity : AppCompatActivity() {
 
         val connManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo: NetworkInfo? = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-        if(networkInfo?.isConnected == true){
-            Toast.makeText(this,"Отключите Wi-Fi!",Toast.LENGTH_LONG).show()
+        if (networkInfo?.isConnected == true) {
+            Toast.makeText(this, "Отключите Wi-Fi!", Toast.LENGTH_LONG).show()
         }
         setContentView(R.layout.activity_home)
         val switch = findViewById<Button>(R.id.switchView)
@@ -147,18 +149,17 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val token:String = GetSettings(this).load("token")
+        val token: String = GetSettings(this).load("token")
 
-            Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),false)
-            Log.d("courier_log", "запросил статус")
+        Http(this@HomeActivity).statusDay(Message(token, "", 0, ""), false)
+        Log.d("courier_log", "запросил статус")
 
         switch.setOnClickListener {
-            Log.e("courier_log",Thread.activeCount().toString())
-            Http(this@HomeActivity).statusDay(Message(token, "", 0, ""),true)
+            Log.e("courier_log", Thread.activeCount().toString())
+            Http(this@HomeActivity).statusDay(Message(token, "", 0, ""), true)
         }
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            broadcastReceiver, IntentFilter(MESSAGE)
-        )
+
+
 
         _context = this
 
@@ -168,15 +169,14 @@ class HomeActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBarHomeActivity)
 
         if (stringOrders.isNotEmpty()) {
-        progressBar.visibility = View.GONE
+            progressBar.visibility = View.GONE
         }
-        var countOrders = orders?.size
 
         ll.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, stringOrders)
 
         ll.setOnItemClickListener { _, _, position, _ ->
 
-            val jsonOrder:String = gson.toJson(orders?.get(position))
+            val jsonOrder: String = gson.toJson(orders?.get(position))
             val intent = Intent(this, DetailsActivity::class.java)
             intent.putExtra("order", jsonOrder)
             stringOrders.clear()
@@ -186,16 +186,24 @@ class HomeActivity : AppCompatActivity() {
         }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-        Rabbit(applicationContext).sendMessage(GetSettings(this).load(SettingsValue.TOKEN.value),RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING,"")
+        Rabbit(applicationContext).sendMessage(
+            GetSettings(this).load(SettingsValue.TOKEN.value),
+            RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING,
+            ""
+        )
     }
 
     override fun onResume() {
         super.onResume()
         Log.d("courier_log", "запросил заказы")
 
-        val token:String = GetSettings(this).load("token")
-        Rabbit(applicationContext).sendMessage(GetSettings(this).load(SettingsValue.TOKEN.value),RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING,"")
-        Http(this@HomeActivity).statusDay(Message(token, "", 0),false)
+        val token: String = GetSettings(this).load("token")
+        Rabbit(applicationContext).sendMessage(
+            GetSettings(this).load(SettingsValue.TOKEN.value),
+            RabbitCode.GET_MY_ORDERS_STATUS_PROGRESSING,
+            ""
+        )
+        Http(this@HomeActivity).statusDay(Message(token, "", 0), false)
         Log.d("courier_log", "запросил статус")
     }
 
